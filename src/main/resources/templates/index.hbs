@@ -48,7 +48,9 @@
                             <table>
                                 <tr>
                                     <td style="vertical-align:top;">
-                                        <div><a target="_blank" href="{{url}}{{buildNumber}}">{{revision}}</a></div>
+                                        {{#if revision}}
+                                            <div><a target="_blank" href="{{url}}{{buildNumber}}">{{revision}}-{{buildNumber}}</a></div>
+                                        {{/if}}
                                         <div><a target="_blank" href="{{url}}">{{name}}</a></div>
                                         <div class="test-report" {{#unless jobsTestResults}}hidden{{/unless}}>
                                             <span>Passed: {{jobsTestResults.passCount}}</span>

@@ -9,16 +9,17 @@
   },
   "devDependencies": {
     "browserify": "13.0.0",
-    "browserify-mustache": "0.0.4",
+    "browserify-handlebars": "1.0.0",
     "del": "2.2.0",
     "gulp": "3.9.1",
     "gulp-browser": "2.0.1",
     "qunitjs": "2.0.1",
-    "gulp-qunit": "1.4.0"
+    "gulp-qunit": "1.4.0",
+    "gulp-shrinkwrap": "2.0.1"
   },
   "browserify": {
     "transform": [
-      "browserify-mustache"
+      "browserify-handlebars"
     ]
   }
 }

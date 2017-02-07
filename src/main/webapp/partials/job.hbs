@@ -8,9 +8,11 @@
             <table>
                 <tr>
                     <td style="vertical-align:top;">
-                        <div><a target="_blank" href="{{url}}{{buildNumber}}">{{revision}}</a></div>
+                        {{#if revision}}
+                            <div><a target="_blank" href="{{url}}{{buildNumber}}">{{revision}}-{{buildNumber}}</a></div>
+                        {{/if}}
                         <div><a target="_blank" href="{{url}}">{{name}}</a></div>
-                        <div class="test-report" {{#shouldHideTestReport}}hidden{{/shouldHideTestReport}}>
+                        <div class="test-report" {{#if shouldHideTestReport}}hidden{{/if}}>
                             <span>Passed: {{passCount}}</span>
                             <span>Failed: {{failCount}}</span>
                             <span>Ignored: {{skipCount}}</span>
@@ -18,9 +20,9 @@
                         <div class="timestamp" data-timestamp="{{timestamp}}">{{timeDifference}}</div>
                     </td>
                     <td style="vertical-align:top;">
-                        {{#comments}}
+                        {{#each comments}}
                             {{.}}<br/>
-                        {{/comments}}
+                        {{/each}}
                     </td>
                 </tr>
             </table>
@@ -28,7 +30,7 @@
     </div>
     <div class="row">
         <div class="col-md-12">
-            <div class="progress" {{#shouldHideProgressBar}}hidden{{/shouldHideProgressBar}}>
+            <div class="progress" {{#if shouldHideProgressBar}}hidden{{/if}}>
                 <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="{{jobCompletionPercentage}}" aria-valuemin="0" aria-valuemax="100" style="width: {{jobCompletionPercentage}}%">
                     <span class="sr-only">{{jobCompletionPercentage}}% Complete</span>
                 </div>

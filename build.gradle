@@ -53,6 +53,8 @@ compileJava.dependsOn {
     gulp_build
 }
 
+gulp_shrinkwrap.dependsOn 'npmInstall'
+
 
 shadowJar {
     enabled = true

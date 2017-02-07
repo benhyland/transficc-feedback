@@ -13,7 +13,7 @@
 var $ = require('jquery');
 var _ = require('lodash');
 var moment = require('moment');
-var jobTemplate = require('./partials/job.mustache');
+var jobTemplate = require('./partials/job.hbs');
 window.$ = window.jQuery = $;
 var heartBeatInterval = null;
 var webSocket;
