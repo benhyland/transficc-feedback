@@ -20,6 +20,11 @@ var webSocket;
 var missedHeartBeats = 0;
 var startUpTime;
 
+// Job Status'
+var SUCCESS = 'success';
+var ERROR = 'error';
+var BUILDING = 'building';
+
 var Jobs = {
     findFirst: function () {
         return _.chain($('.job')).
@@ -42,7 +47,7 @@ var Jobs = {
     findJobToFollow: function (jobName) {
         return _.chain($('.job')).
             filter(function(job) {
-                return $(job).attr('data-priority') == 0 && $(job).attr('data-job-status').toLowerCase() !== 'error';
+                return $(job).attr('data-priority') == 0 && $(job).attr('data-job-status').toLowerCase() !== ERROR;
             }).
             find(function (job) {
                 return $(job).attr('data-title') > jobName;
@@ -161,10 +166,10 @@ $(document).ready(function() {
         var dataPriority = $job.attr('data-priority');
 
         if (dataPriority == 0) {
-            if (currentJobStatus !== 'error' && newJobStatus === 'error') {
+            if ((currentJobStatus !== ERROR || currentJobStatus !== BUILDING) && (newJobStatus === ERROR || newJobStatus === BUILDING)) {
                 var firstJob = Jobs.findFirst()
                 $job.parent().insertBefore($(firstJob).parent());
-            } else if (currentJobStatus === 'error' && newJobStatus !== 'error') {
+            } else if ((currentJobStatus === ERROR || currentJobStatus === BUILDING) && (newJobStatus !== ERROR || newJobStatus !== BUILDING)) {
                 //move to alphabetical order
                 var jobToInsertBefore = Jobs.findJobToFollow(jobName);
 
@@ -194,6 +199,7 @@ $(document).ready(function() {
         $job.replaceWith(jobTemplate({
             name: job.name,
             jobStatus: newJobStatus,
+            jobStatusColor: job.jobStatusColor,
             priority: job.priority,
             revision: job.revision,
             url: job.url,

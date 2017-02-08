@@ -294,15 +294,28 @@ public class JenkinsFacade
     public enum JobStatus
     {
         //This order is important (Enum.compareTo is used in JobRepository)
-        ERROR,
-        DISABLED,
-        SUCCESS;
+        ERROR(1),
+        BUILDING(2),
+        DISABLED(3),
+        SUCCESS(3);
+
+        private final int priority;
+
+        JobStatus(final int priority)
+        {
+            this.priority = priority;
+        }
+
+        public int getPriority()
+        {
+            return priority;
+        }
 
         private static JobStatus parse(final BuildResult result, final JobStatus previousStatus)
         {
             if (result == null)
             {
-                return previousStatus;
+                return BUILDING;
             }
 
             final JobStatus output;
@@ -322,6 +335,8 @@ public class JenkinsFacade
                     break;
                 case BUILDING:
                 case REBUILDING:
+                    output = BUILDING;
+                    break;
                 default:
                     output = previousStatus;
                     break;

@@ -34,13 +34,14 @@ public class PublishableJob
     private final boolean shouldBeFullScreen;
     private final JenkinsFacade.TestResults jobsTestResults;
     private final boolean shouldHideTestResults;
+    private final JobStatus jobStatusColor;
 
     public PublishableJob(final String name,
                           final String url,
                           final int priority,
                           final String revision,
                           final JobStatus jobStatus,
-                          final int buildNumber,
+                          final JobStatus jobStatusToDisplay, final int buildNumber,
                           final long timestamp,
                           final double jobCompletionPercentage,
                           final String[] comments,
@@ -52,6 +53,7 @@ public class PublishableJob
         this.priority = priority;
         this.revision = revision;
         this.jobStatus = jobStatus;
+        this.jobStatusColor = jobStatusToDisplay;
         this.buildNumber = buildNumber;
         this.timestamp = timestamp;
         this.jobCompletionPercentage = jobCompletionPercentage;
@@ -90,6 +92,11 @@ public class PublishableJob
     public JobStatus getJobStatus()
     {
         return jobStatus;
+    }
+
+    public JobStatus getJobStatusColor()
+    {
+        return jobStatusColor;
     }
 
     public int getBuildNumber()

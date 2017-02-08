@@ -30,6 +30,7 @@ public class Job
     private final int priority;
     private volatile String revision = "";
     private volatile JobStatus jobStatus;
+    private volatile JobStatus jobStatusToDisplay;
     private final boolean shouldDisplayCommentsForJob;
     private final VersionControl versionControl;
     private volatile int buildNumber = 0;
@@ -58,6 +59,7 @@ public class Job
             this.jobsTestResults = jobsTestResults;
             this.revision = "".equals(revision) ? this.revision : revision;
             this.jobStatus = jobStatus;
+            this.jobStatusToDisplay = jobStatus == JobStatus.BUILDING ? jobStatusToDisplay : jobStatus;
             this.buildNumber = buildNumber;
             this.timestamp = timestamp;
             this.jobCompletionPercentage = jobCompletionPercentage;
@@ -81,7 +83,7 @@ public class Job
     public PublishableJob createPublishable()
     {
         final String revision = calculateRevision();
-        return new PublishableJob(name, url, priority, revision, jobStatus, buildNumber, timestamp, jobCompletionPercentage, comments, building, jobsTestResults);
+        return new PublishableJob(name, url, priority, revision, jobStatus, jobStatusToDisplay, buildNumber, timestamp, jobCompletionPercentage, comments, building, jobsTestResults);
     }
 
     private String calculateRevision()

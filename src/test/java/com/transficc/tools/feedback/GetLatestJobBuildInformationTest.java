@@ -92,7 +92,7 @@ public class GetLatestJobBuildInformationTest
         //then
         final OutboundWebSocketFrame actualJob = messageBusQueue.take();
         assertThat(actualJob.getType(), is(FrameType.JOB_UPDATE));
-        assertThat(actualJob.getValue(), is(new PublishableJob(jobName, jobUrl, 0, revision, JenkinsFacade.JobStatus.SUCCESS, 0, 5L, 50.0, new String[0], false,
+        assertThat(actualJob.getValue(), is(new PublishableJob(jobName, jobUrl, 0, revision, JenkinsFacade.JobStatus.SUCCESS, JenkinsFacade.JobStatus.SUCCESS, 0, 5L, 50.0, new String[0], false,
                                                                new JenkinsFacade.TestResults(1, 1, 2))));
         verifyZeroInteractions(jobService);
     }

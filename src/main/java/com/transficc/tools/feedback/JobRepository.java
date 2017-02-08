@@ -33,7 +33,7 @@ public class JobRepository implements JobStatusSnapshot
                 sorted((job1, job2) ->
                        {
                            final int comparePriority = Integer.compare(job2.getPriority(), job1.getPriority());
-                           final int compareJobStatus = job1.getJobStatus().compareTo(job2.getJobStatus());
+                           final int compareJobStatus = Integer.compare(job1.getJobStatus().getPriority(), job2.getJobStatus().getPriority());
                            return comparePriority == 0 ? compareJobStatus != 0 && job1.getPriority() == 0 ? compareJobStatus : job1.getName().compareTo(job2.getName()) : comparePriority;
                        }).
                 collect(Collectors.toList());
