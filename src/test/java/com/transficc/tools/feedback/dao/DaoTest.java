@@ -40,6 +40,7 @@ public abstract class DaoTest
         try
         {
             this.dataSourceFile = File.createTempFile("data/", "feedback");
+            this.dataSourceFile.deleteOnExit();
         }
         catch (final IOException e)
         {
