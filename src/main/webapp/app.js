@@ -166,10 +166,11 @@ $(document).ready(function() {
         var dataPriority = $job.attr('data-priority');
 
         if (dataPriority == 0) {
-            if ((currentJobStatus !== ERROR || currentJobStatus !== BUILDING) && (newJobStatus === ERROR || newJobStatus === BUILDING)) {
+
+            if ((currentJobStatus !== ERROR && newJobStatus === ERROR) ||(currentJobStatus !== BUILDING && newJobStatus === BUILDING) ) {
                 var firstJob = Jobs.findFirst()
                 $job.parent().insertBefore($(firstJob).parent());
-            } else if ((currentJobStatus === ERROR || currentJobStatus === BUILDING) && (newJobStatus !== ERROR || newJobStatus !== BUILDING)) {
+            } else if ((currentJobStatus === ERROR && newJobStatus !== ERROR) ||(currentJobStatus === BUILDING && newJobStatus !== BUILDING)) {
                 //move to alphabetical order
                 var jobToInsertBefore = Jobs.findJobToFollow(jobName);
 
