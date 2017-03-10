@@ -25,68 +25,6 @@ var SUCCESS = 'success';
 var ERROR = 'error';
 var BUILDING = 'building';
 
-var Jobs = {
-    findFirst: function (jobStatus) {
-        var element = _.chain($('.job')).
-            filter(function(job) {
-              return $(job).attr('data-priority') == 0 && $(job).attr('data-job-status') == jobStatus;
-            }).
-            head().
-            value()
-
-        if (element !== undefined) {
-            return element;
-        }
-
-        if (jobStatus == ERROR) {
-            return _.chain($('.job')).
-               filter(function(job) {
-                 return $(job).attr('data-priority') == 0;
-               }).
-               head().
-               value()
-        }
-
-        element = _.chain($('.job')).
-            filter(function(job) {
-              return $(job).attr('data-priority') == 0 && $(job).attr('data-job-status') == SUCCESS;
-            }).
-            head().
-            value()
-
-        if (element !== undefined) {
-            return element;
-        }
-
-        return _.chain($('.job')).
-           filter(function(job) {
-             return $(job).attr('data-priority') == 0;
-           }).
-           head().
-           value()
-    },
-
-    findLast: function() {
-        return _.chain($('.job')).
-            filter(function(job) {
-                return $(job).attr('data-priority') == 0;
-            }).
-            last().
-            value();
-    },
-
-    findJobToFollow: function (jobName) {
-        return _.chain($('.job')).
-            filter(function(job) {
-                return $(job).attr('data-priority') == 0 && $(job).attr('data-job-status') !== ERROR && $(job).attr('data-job-status')!== BUILDING;
-            }).
-            find(function (job) {
-                return $(job).attr('data-title') > jobName;
-            }).
-            value();
-    }
-}
-
 $(document).ready(function() {
 
     function setIteration () {
@@ -197,16 +135,24 @@ $(document).ready(function() {
         var dataPriority = $job.attr('data-priority');
 
         if (dataPriority == 0) {
+            var change = (currentJobStatus !== ERROR && newJobStatus === ERROR) ||(currentJobStatus !== BUILDING && newJobStatus === BUILDING) ||
+                (currentJobStatus === ERROR && newJobStatus !== ERROR) ||(currentJobStatus === BUILDING && newJobStatus !== BUILDING);
+            if (change) {
+                var lowPriorityJobs = _.filter($('.job'), function(job) {
+                    return $(job).attr('data-priority') == 0;
+                });
 
-            if ((currentJobStatus !== ERROR && newJobStatus === ERROR) ||(currentJobStatus !== BUILDING && newJobStatus === BUILDING) ) {
-                var firstJob = Jobs.findFirst(newJobStatus)
-                $job.parent().insertBefore($(firstJob).parent());
-            } else if ((currentJobStatus === ERROR && newJobStatus !== ERROR) ||(currentJobStatus === BUILDING && newJobStatus !== BUILDING)) {
-                //move to alphabetical order
-                var jobToInsertBefore = Jobs.findJobToFollow(jobName);
+                var jobToInsertBefore = _.find(lowPriorityJobs, function(job) {
+                    var status = $(job).attr('data-job-status').toLowerCase();
+                    if (status === newJobStatus) {
+                        return $(job).attr('data-title') > jobName;
+                    }
+
+                    return (newJobStatus === ERROR || (newJobStatus === BUILDING && status === SUCCESS))
+                });
 
                 if (jobToInsertBefore === undefined) {
-                    var lastJob = Jobs.findLast();
+                    var lastJob = _.last(lowPriorityJobs);
                     $job.parent().insertAfter($(lastJob).parent());
                 } else {
                     $job.parent().insertBefore($(jobToInsertBefore).parent());
