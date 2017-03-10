@@ -47,7 +47,7 @@ var Jobs = {
     findJobToFollow: function (jobName) {
         return _.chain($('.job')).
             filter(function(job) {
-                return $(job).attr('data-priority') == 0 && $(job).attr('data-job-status').toLowerCase() !== ERROR;
+                return $(job).attr('data-priority') == 0 && $(job).attr('data-job-status').toLowerCase() !== ERROR && $(job).attr('data-job-status').toLowerCase() !== BUILDING;
             }).
             find(function (job) {
                 return $(job).attr('data-title') > jobName;
