@@ -64,8 +64,8 @@ shadowJar {
 
 def defineLocalLibs()
 {
-    String vertxVersion = '3.3.0'
-    String nettyVersion = '4.1.1.Final'
+    String vertxVersion = '3.4.1'
+    String nettyVersion = '4.1.8.Final'
 
     Map libs = [
             'vertx'               : ["io.vertx:vertx-web:$vertxVersion", "io.vertx:vertx-auth-common:$vertxVersion", "io.vertx:vertx-core:$vertxVersion", "io.vertx:vertx-web-templ-handlebars:$vertxVersion"],
@@ -92,7 +92,7 @@ def defineLocalLibs()
             'spring-core'         : 'org.springframework:spring-core:4.2.5.RELEASE',
             'spring-jdbc'         : 'org.springframework:spring-jdbc:4.2.5.RELEASE',
             'spring-tx'           : 'org.springframework:spring-tx:4.2.5.RELEASE',
-            'tf-test'             : ['junit:junit:4.12', 'org.hamcrest:hamcrest-core:1.3', 'org.mockito:mockito-core:2.2.9', 'net.bytebuddy:byte-buddy:1.5.0', 'org.objenesis:objenesis:2.4']
+            'tf-test'             : ['junit:junit:4.12', 'org.hamcrest:hamcrest-core:1.3', 'org.mockito:mockito-core:2.7.22', 'net.bytebuddy:byte-buddy:1.6.11', 'org.objenesis:objenesis:2.5']
     ]
 
     return libs
