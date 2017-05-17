@@ -53,9 +53,6 @@ compileJava.dependsOn {
     gulp_build
 }
 
-gulp_shrinkwrap.dependsOn 'npmInstall'
-
-
 shadowJar {
     enabled = true
     manifest.attributes('Main-Class': 'com.transficc.tools.feedback.FeedbackMain')

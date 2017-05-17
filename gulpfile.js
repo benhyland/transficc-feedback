@@ -4,7 +4,6 @@ var gulp = require('gulp');
 var gulpBrowser = require('gulp-browser');
 var del = require('del');
 var qunit = require('gulp-qunit');
-var shrinkwrap = require('gulp-shrinkwrap');
 
 var paths = {
     distFiles: 'build/resources/main/static',
@@ -36,12 +35,6 @@ gulp.task('test', ['browserify-test'], function() {
     return gulp
         .src([paths.testRunner])
         .pipe(qunit());
-});
-
-gulp.task('shrinkwrap', function() {
-    return gulp.src('package.json')
-        .pipe(shrinkwrap())
-        .pipe(gulp.dest('.'));
 });
 
 gulp.task('build', ['browserify', 'test']);
