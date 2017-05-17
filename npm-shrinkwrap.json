@@ -616,9 +616,8 @@
           "resolved": "https://registry.npmjs.org/inherits/-/inherits-1.0.2.tgz"
         },
         "lodash": {
-          "version": "1.0.2",
-          "from": "lodash@>=1.0.1 <1.1.0",
-          "resolved": "https://registry.npmjs.org/lodash/-/lodash-1.0.2.tgz"
+          "version": "4.17.4",
+          "from": "lodash@~1.0.2"
         },
         "minimatch": {
           "version": "3.0.4",
