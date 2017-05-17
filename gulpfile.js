@@ -3,14 +3,10 @@
 var gulp = require('gulp');
 var gulpBrowser = require('gulp-browser');
 var del = require('del');
-var qunit = require('gulp-qunit');
 
 var paths = {
     distFiles: 'build/resources/main/static',
-    srcFiles: 'src/main/webapp/app.js',
-    testDistFiles: 'build/resources/test',
-    testSrcFiles: 'src/test/webapp/test.js',
-    testRunner: 'src/test/webapp/test-runner.html'
+    srcFiles: 'src/main/webapp/app.js'
 };
 
 gulp.task('clean', function() {
@@ -24,18 +20,6 @@ gulp.task('browserify', ['clean'], function() {
         .pipe(gulp.dest(paths.distFiles));
 });
 
-gulp.task('browserify-test', ['clean'], function() {
-    return gulp
-        .src([paths.testSrcFiles])
-        .pipe(gulpBrowser.browserify())
-        .pipe(gulp.dest(paths.testDistFiles));
-});
 
-gulp.task('test', ['browserify-test'], function() {
-    return gulp
-        .src([paths.testRunner])
-        .pipe(qunit());
-});
-
-gulp.task('build', ['browserify', 'test']);
+gulp.task('build', ['browserify']);
 gulp.task('default', ['build']);

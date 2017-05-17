@@ -13,9 +13,7 @@
     "handlebars": "4.0.8",
     "del": "2.2.2",
     "gulp": "3.9.1",
-    "gulp-browser": "3.0.4",
-    "qunitjs": "2.3.2",
-    "gulp-qunit": "1.5.0"
+    "gulp-browser": "3.0.4"
   },
   "browserify": {
     "transform": [
