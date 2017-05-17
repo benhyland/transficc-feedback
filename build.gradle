@@ -32,6 +32,7 @@ idea {
 
 node {
     download = true
+    version = '6.9.1'
 }
 
 gulp {
