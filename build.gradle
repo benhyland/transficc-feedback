@@ -77,7 +77,7 @@ def defineLocalLibs()
             'flyway-core'         : 'org.flywaydb:flyway-core:4.0',
             'handlebars'          : 'com.github.jknack:handlebars:4.0.3',
             'h2database'          : 'com.h2database:h2:1.4.192',
-            'jenkins-client'      : 'com.offbytwo.jenkins:jenkins-client:0.3.5',
+            'jenkins-client'      : 'com.offbytwo.jenkins:jenkins-client:0.3.7',
             'jcip-annotations'    : 'net.jcip:jcip-annotations:1.0',
             'netty'               : ["io.netty:netty-common:$nettyVersion", "io.netty:netty-resolver:$nettyVersion", "io.netty:netty-resolver-dns:$nettyVersion", "io.netty:netty-buffer:$nettyVersion",
                                      "io.netty:netty-transport:$nettyVersion", "io.netty:netty-handler:$nettyVersion", "io.netty:netty-codec:$nettyVersion", "io.netty:netty-codec-http:$nettyVersion",

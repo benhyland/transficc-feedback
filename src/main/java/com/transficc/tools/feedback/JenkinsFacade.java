@@ -71,7 +71,7 @@ public class JenkinsFacade
         }
     }
 
-    public Result<Integer, LatestBuildInformation> getLatestBuildInformation(final String jobName, final JobStatus previousJobStatus)
+    Result<Integer, LatestBuildInformation> getLatestBuildInformation(final String jobName, final JobStatus previousJobStatus)
     {
         try
         {
@@ -80,7 +80,7 @@ public class JenkinsFacade
             {
                 return Result.error(404);
             }
-            else if (job.getLastBuild().equals(Build.BUILD_HAS_NEVER_RAN))
+            else if (job.getLastBuild().equals(Build.BUILD_HAS_NEVER_RUN))
             {
                 return Result.error(400);
             }

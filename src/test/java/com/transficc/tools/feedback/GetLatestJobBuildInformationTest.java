@@ -126,7 +126,7 @@ public class GetLatestJobBuildInformationTest
     public void shouldDoNothingIfJobDoesNotHaveABuild() throws IOException
     {
         given(jenkins.getJob(jobName)).willReturn(jobWithDetails);
-        given(jobWithDetails.getLastBuild()).willReturn(Build.BUILD_HAS_NEVER_RAN);
+        given(jobWithDetails.getLastBuild()).willReturn(Build.BUILD_HAS_NEVER_RUN);
 
         jobChecker.run();
 

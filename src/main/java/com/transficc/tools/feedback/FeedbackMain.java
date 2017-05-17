@@ -42,6 +42,8 @@ import com.transficc.tools.feedback.util.SafeSerialisation;
 
 import org.flywaydb.core.Flyway;
 import org.h2.jdbcx.JdbcConnectionPool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import io.vertx.core.Vertx;
@@ -52,6 +54,7 @@ import io.vertx.ext.web.Router;
 public class FeedbackMain
 {
     private static final String SERVICE_NAME = "transficc-feedback";
+    private static final Logger LOGGER = LoggerFactory.getLogger(FeedbackMain.class);
 
     public static void main(final String[] args) throws IOException
     {
@@ -98,14 +101,16 @@ public class FeedbackMain
     private static JenkinsServer createJenkinsServer(final FeedbackProperties feedbackProperties)
     {
         final JenkinsServer jenkins;
+        final String jenkinsUrl = feedbackProperties.getJenkinsUrl();
         if (feedbackProperties.getJenkinsUsername() == null)
         {
-            jenkins = new JenkinsServer(URI.create(feedbackProperties.getJenkinsUrl()));
+            jenkins = new JenkinsServer(URI.create(jenkinsUrl));
         }
         else
         {
-            jenkins = new JenkinsServer(URI.create(feedbackProperties.getJenkinsUrl()), feedbackProperties.getJenkinsUsername(), feedbackProperties.getJenkinsPassword());
+            jenkins = new JenkinsServer(URI.create(jenkinsUrl), feedbackProperties.getJenkinsUsername(), feedbackProperties.getJenkinsPassword());
         }
+        LOGGER.info("Connecting to Jenkins server at {}", jenkinsUrl);
         return jenkins;
     }
 
