@@ -10,8 +10,8 @@ buildscript {
 }
 
 plugins {
-    id "com.moowork.node" version "0.12"
-    id "com.moowork.gulp" version "0.12"
+    id "com.moowork.node" version "1.1.1"
+    id "com.moowork.gulp" version "1.1.1"
 }
 
 repositories {
@@ -31,7 +31,6 @@ idea {
 }
 
 node {
-    version = '4.3.2'
     download = true
 }
 

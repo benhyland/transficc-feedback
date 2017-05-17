@@ -3,18 +3,19 @@
   "version": "0.0.1",
   "description": "portal for provided feedback to Jenkins jobs",
   "dependencies": {
-    "jquery": "2.2.0",
-    "lodash": "4.3.0",
-    "moment": "2.14.1"
+    "jquery": "3.2.1",
+    "lodash": "4.17.4",
+    "moment": "2.18.1"
   },
   "devDependencies": {
-    "browserify": "13.0.0",
+    "browserify": "14.3.0",
     "browserify-handlebars": "1.0.0",
-    "del": "2.2.0",
+    "handlebars": "4.0.8",
+    "del": "2.2.2",
     "gulp": "3.9.1",
-    "gulp-browser": "2.0.1",
-    "qunitjs": "2.0.1",
-    "gulp-qunit": "1.4.0",
+    "gulp-browser": "3.0.4",
+    "qunitjs": "2.3.2",
+    "gulp-qunit": "1.5.0",
     "gulp-shrinkwrap": "2.0.1"
   },
   "browserify": {
