@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 
 import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.model.Build;
+import com.offbytwo.jenkins.model.BuildChangeSet;
 import com.offbytwo.jenkins.model.BuildChangeSetItem;
 import com.offbytwo.jenkins.model.BuildResult;
 import com.offbytwo.jenkins.model.BuildWithDetails;
@@ -90,14 +91,22 @@ public class JenkinsFacade
                 final String revision = getRevision(buildDetails);
                 final JobStatus jobStatus = !job.isBuildable() ? JobStatus.DISABLED : JobStatus.parse(buildDetails.getResult(), previousJobStatus);
                 final double jobCompletionPercentage = (double)(clockService.currentTimeMillis() - buildDetails.getTimestamp()) / buildDetails.getEstimatedDuration() * 100;
-                final List<String> commentList = buildDetails
-                        .getChangeSet()
-                        .getItems()
-                        .stream()
-                        .map(BuildChangeSetItem::getComment)
-                        .collect(Collectors.toList());
-                final String[] comments = new String[commentList.size()];
-                commentList.toArray(comments);
+                final BuildChangeSet changeSet = buildDetails.getChangeSet();
+                final String[] comments;
+                if (changeSet == null)
+                {
+                    comments = new String[0];
+                }
+                else
+                {
+                    final List<String> commentList = changeSet
+                            .getItems()
+                            .stream()
+                            .map(BuildChangeSetItem::getComment)
+                            .collect(Collectors.toList());
+                    comments = new String[commentList.size()];
+                    commentList.toArray(comments);
+                }
                 final TestResults testResults = getTestResults(buildDetails);
                 return Result.success(new LatestBuildInformation(revision,
                                                                  jobStatus,
