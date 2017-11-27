@@ -5,6 +5,7 @@ var gulpBrowser = require('gulp-browser');
 var del = require('del');
 
 var paths = {
+    // WARNING: Input and output paths are also present in the Gradle file. Keep them in sync.
     distFiles: 'build/resources/main/static',
     srcFiles: 'src/main/webapp/app.js'
 };

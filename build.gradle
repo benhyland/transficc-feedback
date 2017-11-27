@@ -49,9 +49,15 @@ gulp {
 //gulp_build.dependsOn 'installGulp'
 gulp_build.dependsOn 'npmInstall'
 
-compileJava.dependsOn {
-    gulp_build
-}
+// WARNING: Input and output paths are also present in the gulpfile. Keep them in sync.
+gulp_build.inputs.dir 'src/main/webapp'
+gulp_build.inputs.dir 'node_modules'
+gulp_build.outputs.dir 'build/resources/main/static'
+
+npmInstall.inputs.file 'package.json'
+npmInstall.outputs.dir 'node_modules'
+
+compileJava.dependsOn 'gulp_build'
 
 shadowJar {
     enabled = true
