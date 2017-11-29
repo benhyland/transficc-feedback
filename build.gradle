@@ -68,7 +68,7 @@ shadowJar {
 def defineLocalLibs()
 {
     String vertxVersion = '3.4.1'
-    String nettyVersion = '4.1.8.Final'
+    String nettyVersion = '4.1.17.Final'
     String mockitoVersion = '2.8.9'
     String byteBuddyVersion = '1.6.14'
 
