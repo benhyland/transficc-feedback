@@ -51,6 +51,7 @@ gulp_build.dependsOn 'npmInstall'
 
 // WARNING: Input and output paths are also present in the gulpfile. Keep them in sync.
 gulp_build.inputs.dir 'src/main/webapp'
+gulp_build.inputs.dir 'src/main/resources'
 gulp_build.inputs.dir 'node_modules'
 gulp_build.outputs.dir 'build/resources/main/static'
 
