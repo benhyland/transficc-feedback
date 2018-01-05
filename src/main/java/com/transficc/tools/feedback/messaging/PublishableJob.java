@@ -220,7 +220,7 @@ public class PublishableJob
     public int hashCode()
     {
         int result;
-        long temp;
+        final long temp;
         result = name != null ? name.hashCode() : 0;
         result = 31 * result + (url != null ? url.hashCode() : 0);
         result = 31 * result + priority;
