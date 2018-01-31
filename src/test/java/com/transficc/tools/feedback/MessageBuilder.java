@@ -13,6 +13,7 @@
 package com.transficc.tools.feedback;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 
 public final class MessageBuilder<T>
 {
@@ -22,9 +23,9 @@ public final class MessageBuilder<T>
     {
         try
         {
-            this.instance = clazz.newInstance();
+            this.instance = clazz.getConstructor().newInstance();
         }
-        catch (final IllegalAccessException | InstantiationException e)
+        catch (final NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e)
         {
             throw new RuntimeException(e);
         }
