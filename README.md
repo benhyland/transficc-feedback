@@ -18,6 +18,10 @@ We find it useful to see what stage of our pipeline various commits are, and wha
 ./gradlew shadowJar
 ```
 
+## Important Jenkins configuration
+
+You need to ensure the `Jenkins URL` is set otherwise Feedback will not be able to provide useful links to your various jobs or receive updates. At the time of writing, this can be found under `Jenkins Location` in `Configure System`.
+
 ## Configure
 
 TransFICC Feedback can be configured in two ways. You can either provide a configuration file on it's classpath called feedback.properties, or provide a properties file as a command line argument
@@ -34,6 +38,19 @@ for the jar when running. The following properties are available for configurati
 - `feedback.versioncontrol` states what version control software you are using (only Git and SVN currently supported)
 - `feedback.test.job-test` list of job names whose test results should be persisted to allow for test analytics
 
+### Our Configuration
+
+I've included how we configured Jenkins for the sake of brevity
+
+```
+feedback.jenkins.url=http://10.24.2.83:8080
+feedback.port=4567
+feedback.job.name=master-commit,integration-test,acceptance-test,venue-compatibility-test
+feedback.job.priority=5,4,3,2
+feedback.job.master=master-commit
+feedback.versioncontrol=GIT
+feedback.test.job=acceptance-test
+```
 
 
 ## Run

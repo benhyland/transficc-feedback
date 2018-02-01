@@ -13,7 +13,6 @@
 package com.transficc.tools.feedback;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
@@ -56,7 +55,7 @@ public class FeedbackMain
     private static final String SERVICE_NAME = "transficc-feedback";
     private static final Logger LOGGER = LoggerFactory.getLogger(FeedbackMain.class);
 
-    public static void main(final String[] args) throws IOException
+    public static void main(final String[] args)
     {
         final Optional<File> propertiesFile = args.length == 1 ? Optional.of(new File(args[0])) : Optional.empty();
         final FeedbackProperties feedbackProperties = new FeedbackProperties(propertiesFile);
