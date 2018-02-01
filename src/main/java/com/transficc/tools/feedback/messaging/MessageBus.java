@@ -14,7 +14,7 @@ package com.transficc.tools.feedback.messaging;
 
 import java.util.concurrent.BlockingQueue;
 
-import com.transficc.tools.feedback.Job;
+import com.transficc.tools.feedback.domain.Job;
 import com.transficc.tools.feedback.routes.websocket.OutboundWebSocketFrame;
 
 public class MessageBus

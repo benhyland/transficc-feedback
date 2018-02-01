@@ -19,6 +19,10 @@ import java.time.ZonedDateTime;
 
 import com.transficc.functionality.Result;
 import com.transficc.tools.feedback.dao.JobTestResultsDao;
+import com.transficc.tools.feedback.domain.Job;
+import com.transficc.tools.feedback.domain.LatestBuildInformation;
+import com.transficc.tools.feedback.domain.TestResults;
+import com.transficc.tools.feedback.jenkins.JenkinsFacade;
 import com.transficc.tools.feedback.messaging.MessageBus;
 
 import org.slf4j.Logger;
@@ -54,7 +58,7 @@ public class GetLatestJobBuildInformation implements Runnable
     {
         try
         {
-            final Result<Integer, JenkinsFacade.LatestBuildInformation> latestBuildInformation = jenkinsFacade.getLatestBuildInformation(job.getName(), job.getJobStatus());
+            final Result<Integer, LatestBuildInformation> latestBuildInformation = jenkinsFacade.getLatestBuildInformation(job.getName(), job.getJobStatus());
             latestBuildInformation.consume(statusCode ->
                                            {
                                                if (statusCode == 404)
@@ -80,7 +84,7 @@ public class GetLatestJobBuildInformation implements Runnable
 
                                                if (job.hasJustCompleted() && shouldPersistTestResults)
                                                {
-                                                   final JenkinsFacade.TestResults testResults = buildInformation.getTestResults();
+                                                   final TestResults testResults = buildInformation.getTestResults();
                                                    final int total = testResults.getFailCount() + testResults.getPassCount() + testResults.getSkipCount();
                                                    final ZonedDateTime startTime = ZonedDateTime.of(LocalDateTime.ofInstant(Instant.ofEpochMilli(buildInformation.getTimestamp()),
                                                                                                                             ZoneOffset.UTC), ZoneOffset.UTC);

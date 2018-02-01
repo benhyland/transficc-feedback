@@ -15,6 +15,8 @@ package com.transficc.tools.feedback;
 import java.util.List;
 
 import com.transficc.functionality.Result;
+import com.transficc.tools.feedback.domain.Job;
+import com.transficc.tools.feedback.jenkins.JenkinsFacade;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

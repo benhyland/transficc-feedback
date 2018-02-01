@@ -10,16 +10,13 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
  * OR CONDITIONS OF ANY KIND, either express or implied.  See the License for the specific language governing permissions and limitations under the License.
  */
-package com.transficc.tools.feedback;
+package com.transficc.tools.feedback.domain;
 
 import java.util.Arrays;
 
+import com.transficc.tools.feedback.VersionControl;
 import com.transficc.tools.feedback.messaging.MessageBus;
 import com.transficc.tools.feedback.messaging.PublishableJob;
-
-
-import static com.transficc.tools.feedback.JenkinsFacade.JobStatus;
-import static com.transficc.tools.feedback.JenkinsFacade.TestResults;
 
 public class Job
 {
@@ -51,8 +48,8 @@ public class Job
         this.versionControl = versionControl;
     }
 
-    void maybeUpdateAndPublish(final String revision, final JobStatus jobStatus, final int buildNumber, final long timestamp, final double jobCompletionPercentage, final MessageBus messageBus,
-                               final String[] comments, final boolean building, final TestResults jobsTestResults)
+    public void maybeUpdateAndPublish(final String revision, final JobStatus jobStatus, final int buildNumber, final long timestamp, final double jobCompletionPercentage, final MessageBus messageBus,
+                                      final String[] comments, final boolean building, final TestResults jobsTestResults)
     {
         if (isThereAnUpdate(revision, jobStatus, buildNumber, jobCompletionPercentage, building))
         {

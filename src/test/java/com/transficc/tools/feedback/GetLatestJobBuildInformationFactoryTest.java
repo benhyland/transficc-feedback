@@ -13,6 +13,9 @@
 package com.transficc.tools.feedback;
 
 import com.transficc.tools.feedback.dao.JobTestResultsDao;
+import com.transficc.tools.feedback.domain.Job;
+import com.transficc.tools.feedback.domain.JobStatus;
+import com.transficc.tools.feedback.jenkins.JenkinsFacade;
 import com.transficc.tools.feedback.messaging.MessageBus;
 
 import org.junit.Test;
@@ -31,7 +34,7 @@ public class GetLatestJobBuildInformationFactoryTest
     @Test
     public void shouldCreateARunnableThatShouldPersistsTestInformation()
     {
-        final GetLatestJobBuildInformation buildInformation = factory.create(new Job("SpecialJob", "google.com", 1, JenkinsFacade.JobStatus.SUCCESS, false, VersionControl.GIT), null);
+        final GetLatestJobBuildInformation buildInformation = factory.create(new Job("SpecialJob", "google.com", 1, JobStatus.SUCCESS, false, VersionControl.GIT), null);
 
         assertThat(buildInformation.isShouldPersistTestResults(), is(true));
     }
@@ -39,7 +42,7 @@ public class GetLatestJobBuildInformationFactoryTest
     @Test
     public void shouldCreateARunnableThatShouldNotPersistsTestInformation()
     {
-        final GetLatestJobBuildInformation buildInformation = factory.create(new Job("AnotherJob", "google.com", 1, JenkinsFacade.JobStatus.SUCCESS, false, VersionControl.GIT), null);
+        final GetLatestJobBuildInformation buildInformation = factory.create(new Job("AnotherJob", "google.com", 1, JobStatus.SUCCESS, false, VersionControl.GIT), null);
 
         assertThat(buildInformation.isShouldPersistTestResults(), is(false));
     }

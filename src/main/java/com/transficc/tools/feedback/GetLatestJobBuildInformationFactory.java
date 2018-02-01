@@ -17,6 +17,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.transficc.tools.feedback.dao.JobTestResultsDao;
+import com.transficc.tools.feedback.domain.Job;
+import com.transficc.tools.feedback.jenkins.JenkinsFacade;
 import com.transficc.tools.feedback.messaging.MessageBus;
 
 public class GetLatestJobBuildInformationFactory

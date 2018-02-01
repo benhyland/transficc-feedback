@@ -12,6 +12,8 @@
  */
 package com.transficc.tools.feedback;
 
+import com.transficc.tools.feedback.domain.Job;
+import com.transficc.tools.feedback.domain.JobStatus;
 import com.transficc.tools.feedback.messaging.MessageBus;
 import com.transficc.tools.feedback.messaging.PublishableJob;
 
@@ -26,9 +28,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-
-
-import static com.transficc.tools.feedback.JenkinsFacade.*;
 
 public class JobTest
 {

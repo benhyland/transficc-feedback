@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.offbytwo.jenkins.JenkinsServer;
 import com.transficc.tools.feedback.dao.JobTestResultsDao;
+import com.transficc.tools.feedback.jenkins.JenkinsFacade;
 import com.transficc.tools.feedback.messaging.MessageBus;
 import com.transficc.tools.feedback.messaging.PublishableJob;
 import com.transficc.tools.feedback.routes.websocket.OutboundWebSocketFrame;
@@ -40,7 +41,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 
 
-import static com.transficc.tools.feedback.JenkinsFacade.JobStatus;
+import com.transficc.tools.feedback.domain.JobStatus;
 
 public class JobFinderTest
 {

@@ -18,6 +18,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import com.transficc.tools.feedback.domain.Job;
 import com.transficc.tools.feedback.messaging.MessageBus;
 
 public class JobService

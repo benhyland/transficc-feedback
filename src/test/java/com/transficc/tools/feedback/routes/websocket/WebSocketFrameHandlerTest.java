@@ -15,8 +15,8 @@ package com.transficc.tools.feedback.routes.websocket;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.transficc.tools.feedback.JenkinsFacade;
-import com.transficc.tools.feedback.Job;
+import com.transficc.tools.feedback.domain.JobStatus;
+import com.transficc.tools.feedback.domain.Job;
 import com.transficc.tools.feedback.JobRepository;
 import com.transficc.tools.feedback.VersionControl;
 import com.transficc.tools.feedback.util.SafeSerialisation;
@@ -67,8 +67,8 @@ public class WebSocketFrameHandlerTest
     public void shouldSendASnapshotForAllJobsWhenReceivingASnapshotRequest()
     {
         //given
-        final Job job1 = new Job("blah", "http://www.google.com", 1, JenkinsFacade.JobStatus.DISABLED, false, VersionControl.GIT);
-        final Job job2 = new Job("Judd", "http://www.google.com", 1, JenkinsFacade.JobStatus.SUCCESS, true, VersionControl.GIT);
+        final Job job1 = new Job("blah", "http://www.google.com", 1, JobStatus.DISABLED, false, VersionControl.GIT);
+        final Job job2 = new Job("Judd", "http://www.google.com", 1, JobStatus.SUCCESS, true, VersionControl.GIT);
         jobRepository.put("blah", job1);
         jobRepository.put("Judd", job2);
         final WebSocketFrameImpl frame = new WebSocketFrameImpl("snapshot");

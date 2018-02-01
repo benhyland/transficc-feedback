@@ -14,10 +14,10 @@ package com.transficc.tools.feedback.messaging;
 
 import java.util.Arrays;
 
-import com.transficc.tools.feedback.JenkinsFacade;
+import com.transficc.tools.feedback.domain.TestResults;
 
 
-import static com.transficc.tools.feedback.JenkinsFacade.JobStatus;
+import com.transficc.tools.feedback.domain.JobStatus;
 
 public class PublishableJob
 {
@@ -32,7 +32,7 @@ public class PublishableJob
     private final String[] comments;
     private final boolean shouldHideProgressBar;
     private final boolean shouldBeFullScreen;
-    private final JenkinsFacade.TestResults jobsTestResults;
+    private final TestResults jobsTestResults;
     private final boolean shouldHideTestResults;
     private final JobStatus jobStatusColor;
 
@@ -46,7 +46,7 @@ public class PublishableJob
                           final double jobCompletionPercentage,
                           final String[] comments,
                           final boolean building,
-                          final JenkinsFacade.TestResults jobsTestResults)
+                          final TestResults jobsTestResults)
     {
         this.name = name;
         this.url = url;
@@ -64,7 +64,7 @@ public class PublishableJob
         this.jobsTestResults = jobsTestResults;
     }
 
-    public JenkinsFacade.TestResults getJobsTestResults()
+    public TestResults getJobsTestResults()
     {
         return jobsTestResults;
     }

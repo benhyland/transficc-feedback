@@ -31,6 +31,10 @@ import com.offbytwo.jenkins.model.BuildResult;
 import com.offbytwo.jenkins.model.BuildWithDetails;
 import com.offbytwo.jenkins.model.JobWithDetails;
 import com.transficc.tools.feedback.dao.JobTestResultsDao;
+import com.transficc.tools.feedback.domain.Job;
+import com.transficc.tools.feedback.domain.JobStatus;
+import com.transficc.tools.feedback.domain.TestResults;
+import com.transficc.tools.feedback.jenkins.JenkinsFacade;
 import com.transficc.tools.feedback.messaging.MessageBus;
 import com.transficc.tools.feedback.messaging.PublishableJob;
 import com.transficc.tools.feedback.routes.websocket.FrameType;
@@ -74,7 +78,7 @@ public class GetLatestJobBuildInformationTest
         jobName = "Tom is the best";
         given(jobWithDetails.isBuildable()).willReturn(true);
         messageBus = new MessageBus(messageBusQueue);
-        this.jobChecker = new GetLatestJobBuildInformation(messageBus, jobService, new Job(jobName, "tom-url", 0, JenkinsFacade.JobStatus.SUCCESS, false, VersionControl.GIT),
+        this.jobChecker = new GetLatestJobBuildInformation(messageBus, jobService, new Job(jobName, "tom-url", 0, JobStatus.SUCCESS, false, VersionControl.GIT),
                                                            new JenkinsFacade(jenkins, null, null, () -> 10, VersionControl.GIT), false, jobTestResultsDao);
     }
 
@@ -92,8 +96,8 @@ public class GetLatestJobBuildInformationTest
         //then
         final OutboundWebSocketFrame actualJob = messageBusQueue.take();
         assertThat(actualJob.getType(), is(FrameType.JOB_UPDATE));
-        assertThat(actualJob.getValue(), is(new PublishableJob(jobName, jobUrl, 0, revision, JenkinsFacade.JobStatus.SUCCESS, JenkinsFacade.JobStatus.SUCCESS, 0, 5L, 50.0, new String[0], false,
-                                                               new JenkinsFacade.TestResults(1, 1, 2))));
+        assertThat(actualJob.getValue(), is(new PublishableJob(jobName, jobUrl, 0, revision, JobStatus.SUCCESS, JobStatus.SUCCESS, 0, 5L, 50.0, new String[0], false,
+                                                               new TestResults(1, 1, 2))));
         verifyZeroInteractions(jobService);
     }
 
@@ -138,7 +142,7 @@ public class GetLatestJobBuildInformationTest
     public void shouldPersistTestResultsIfJobJustCompletedAndHasPersistenceEnabled() throws IOException, InterruptedException
     {
         //Given
-        this.jobChecker = new GetLatestJobBuildInformation(messageBus, jobService, new Job(jobName, "tom-url", 0, JenkinsFacade.JobStatus.SUCCESS, false, VersionControl.GIT),
+        this.jobChecker = new GetLatestJobBuildInformation(messageBus, jobService, new Job(jobName, "tom-url", 0, JobStatus.SUCCESS, false, VersionControl.GIT),
                                                            new JenkinsFacade(jenkins, null, null, () -> 10, VersionControl.GIT), true, jobTestResultsDao);
         final String revision = "5435dsd";
         final ZonedDateTime timestamp = ZonedDateTime.now(Clock.systemUTC());
@@ -160,7 +164,7 @@ public class GetLatestJobBuildInformationTest
     public void shouldNotPersistTestResultsIfJobJustCompletedAndDoesNotPersistenceEnabled() throws IOException
     {
         //Given
-        this.jobChecker = new GetLatestJobBuildInformation(messageBus, jobService, new Job(jobName, "tom-url", 0, JenkinsFacade.JobStatus.SUCCESS, false, VersionControl.GIT),
+        this.jobChecker = new GetLatestJobBuildInformation(messageBus, jobService, new Job(jobName, "tom-url", 0, JobStatus.SUCCESS, false, VersionControl.GIT),
                                                            new JenkinsFacade(jenkins, null, null, () -> 10, VersionControl.GIT), false, jobTestResultsDao);
         final String revision = "5435dsd";
         final ZonedDateTime timestamp = ZonedDateTime.now(Clock.systemUTC());
@@ -182,7 +186,7 @@ public class GetLatestJobBuildInformationTest
     public void shouldNotPersistTestResultsIfJobHasNotJustCompletedAndHasPersistenceEnabled() throws IOException
     {
         //Given
-        this.jobChecker = new GetLatestJobBuildInformation(messageBus, jobService, new Job(jobName, "tom-url", 0, JenkinsFacade.JobStatus.SUCCESS, false, VersionControl.GIT),
+        this.jobChecker = new GetLatestJobBuildInformation(messageBus, jobService, new Job(jobName, "tom-url", 0, JobStatus.SUCCESS, false, VersionControl.GIT),
                                                            new JenkinsFacade(jenkins, null, null, () -> 10, VersionControl.GIT), true, jobTestResultsDao);
         final String revision = "5435dsd";
         final ZonedDateTime timestamp = ZonedDateTime.now(Clock.systemUTC());
@@ -204,7 +208,7 @@ public class GetLatestJobBuildInformationTest
     public void shouldNotPersistTestResultsIfJobHasNotJustCompletedAndDoesNotHavePersistenceEnabled() throws IOException
     {
         //Given
-        this.jobChecker = new GetLatestJobBuildInformation(messageBus, jobService, new Job(jobName, "tom-url", 0, JenkinsFacade.JobStatus.SUCCESS, false, VersionControl.GIT),
+        this.jobChecker = new GetLatestJobBuildInformation(messageBus, jobService, new Job(jobName, "tom-url", 0, JobStatus.SUCCESS, false, VersionControl.GIT),
                                                            new JenkinsFacade(jenkins, null, null, () -> 10, VersionControl.GIT), false, jobTestResultsDao);
         final String revision = "5435dsd";
         final ZonedDateTime timestamp = ZonedDateTime.now(Clock.systemUTC());
@@ -226,7 +230,7 @@ public class GetLatestJobBuildInformationTest
     public void shouldNotPersistTestResultsIfJobHasJustStartedAndHasPersistenceEnabled() throws IOException
     {
         //Given
-        this.jobChecker = new GetLatestJobBuildInformation(messageBus, jobService, new Job(jobName, "tom-url", 0, JenkinsFacade.JobStatus.SUCCESS, false, VersionControl.GIT),
+        this.jobChecker = new GetLatestJobBuildInformation(messageBus, jobService, new Job(jobName, "tom-url", 0, JobStatus.SUCCESS, false, VersionControl.GIT),
                                                            new JenkinsFacade(jenkins, null, null, () -> 10, VersionControl.GIT), true, jobTestResultsDao);
         final String revision = "5435dsd";
         final ZonedDateTime timestamp = ZonedDateTime.now(Clock.systemUTC());
@@ -248,7 +252,7 @@ public class GetLatestJobBuildInformationTest
     public void shouldNotPersistTestResultsIfJobHasJustStartedAndDoesNotHavePersistenceEnabled() throws IOException
     {
         //Given
-        this.jobChecker = new GetLatestJobBuildInformation(messageBus, jobService, new Job(jobName, "tom-url", 0, JenkinsFacade.JobStatus.SUCCESS, false, VersionControl.GIT),
+        this.jobChecker = new GetLatestJobBuildInformation(messageBus, jobService, new Job(jobName, "tom-url", 0, JobStatus.SUCCESS, false, VersionControl.GIT),
                                                            new JenkinsFacade(jenkins, null, null, () -> 10, VersionControl.GIT), false, jobTestResultsDao);
         final String revision = "5435dsd";
         final ZonedDateTime timestamp = ZonedDateTime.now(Clock.systemUTC());

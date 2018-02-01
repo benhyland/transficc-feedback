@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import com.transficc.tools.feedback.domain.Job;
 import com.transficc.tools.feedback.messaging.PublishableJob;
 import com.transficc.tools.feedback.routes.JobStatusSnapshot;
 

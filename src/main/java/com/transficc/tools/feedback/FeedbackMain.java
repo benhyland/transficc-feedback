@@ -29,6 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.offbytwo.jenkins.JenkinsServer;
 import com.transficc.tools.feedback.dao.IterationDao;
 import com.transficc.tools.feedback.dao.JobTestResultsDao;
+import com.transficc.tools.feedback.jenkins.JenkinsFacade;
 import com.transficc.tools.feedback.messaging.JobUpdateSubscriber;
 import com.transficc.tools.feedback.messaging.MessageBus;
 import com.transficc.tools.feedback.routes.Routes;
