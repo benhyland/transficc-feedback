@@ -18,12 +18,13 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
 import com.transficc.functionality.Result;
+import com.transficc.tools.feedback.ci.JobService;
+import com.transficc.tools.feedback.ci.jenkins.JenkinsFacade;
 import com.transficc.tools.feedback.dao.JobTestResultsDao;
 import com.transficc.tools.feedback.domain.Job;
 import com.transficc.tools.feedback.domain.LatestBuildInformation;
 import com.transficc.tools.feedback.domain.TestResults;
-import com.transficc.tools.feedback.jenkins.JenkinsFacade;
-import com.transficc.tools.feedback.messaging.MessageBus;
+import com.transficc.tools.feedback.web.messaging.MessageBus;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +64,7 @@ public class GetLatestJobBuildInformation implements Runnable
                                            {
                                                if (statusCode == 404)
                                                {
-                                                   jobService.onJobNotFound(job.getName());
+//                                                   jobService.onJobNotFound(job.getName());
                                                }
                                                else
                                                {

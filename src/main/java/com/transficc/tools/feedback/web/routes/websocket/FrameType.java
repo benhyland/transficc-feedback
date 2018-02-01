@@ -10,27 +10,13 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
  * OR CONDITIONS OF ANY KIND, either express or implied.  See the License for the specific language governing permissions and limitations under the License.
  */
-package com.transficc.tools.feedback.domain;
+package com.transficc.tools.feedback.web.routes.websocket;
 
-public enum JobStatus
+public enum FrameType
 {
-    //This order is important (Enum.compareTo is used in JobRepository)
-    ERROR(1),
-    BUILDING(2),
-    DISABLED(3),
-    SUCCESS(3);
-
-    private final int priority;
-
-    JobStatus(final int priority)
-    {
-        this.priority = priority;
-    }
-
-    public int getPriority()
-    {
-        return priority;
-    }
-
-
+    JOB_UPDATE,
+    JOB_DELETED,
+    STATUS_UPDATE,
+    ITERATION_UPDATE,
+    HEARTBEAT;
 }

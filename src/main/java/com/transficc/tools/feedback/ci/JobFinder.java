@@ -10,13 +10,13 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
  * OR CONDITIONS OF ANY KIND, either express or implied.  See the License for the specific language governing permissions and limitations under the License.
  */
-package com.transficc.tools.feedback;
+package com.transficc.tools.feedback.ci;
 
 import java.util.List;
 
 import com.transficc.functionality.Result;
+import com.transficc.tools.feedback.ci.jenkins.JenkinsFacade;
 import com.transficc.tools.feedback.domain.Job;
-import com.transficc.tools.feedback.jenkins.JenkinsFacade;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +27,7 @@ public class JobFinder implements Runnable
     private final JobService jobService;
     private final JenkinsFacade jenkinsFacade;
 
-    JobFinder(final JobService jobService, final JenkinsFacade jenkinsFacade)
+    public JobFinder(final JobService jobService, final JenkinsFacade jenkinsFacade)
     {
         this.jobService = jobService;
         this.jenkinsFacade = jenkinsFacade;

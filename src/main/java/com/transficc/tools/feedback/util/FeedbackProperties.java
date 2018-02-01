@@ -23,7 +23,7 @@ import java.util.Properties;
 
 import com.transficc.functionality.Optionality;
 import com.transficc.tools.feedback.FeedbackMain;
-import com.transficc.tools.feedback.VersionControl;
+import com.transficc.tools.feedback.domain.VersionControl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

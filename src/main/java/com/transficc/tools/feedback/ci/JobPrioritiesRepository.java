@@ -10,14 +10,21 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
  * OR CONDITIONS OF ANY KIND, either express or implied.  See the License for the specific language governing permissions and limitations under the License.
  */
-package com.transficc.tools.feedback.messaging;
+package com.transficc.tools.feedback.ci;
 
-public class PublishableIteration
+import java.util.Map;
+
+public class JobPrioritiesRepository
 {
-    private final String iteration;
+    private final Map<String, Integer> jobsWithPriorities;
 
-    public PublishableIteration(final String iteration)
+    public JobPrioritiesRepository(final Map<String, Integer> jobsWithPriorities)
     {
-        this.iteration = iteration;
+        this.jobsWithPriorities = jobsWithPriorities;
+    }
+
+    public int getPriorityForJob(final String jobName)
+    {
+        return jobsWithPriorities.getOrDefault(jobName, 0);
     }
 }

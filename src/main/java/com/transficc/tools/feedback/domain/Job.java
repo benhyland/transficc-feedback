@@ -14,9 +14,8 @@ package com.transficc.tools.feedback.domain;
 
 import java.util.Arrays;
 
-import com.transficc.tools.feedback.VersionControl;
-import com.transficc.tools.feedback.messaging.MessageBus;
-import com.transficc.tools.feedback.messaging.PublishableJob;
+import com.transficc.tools.feedback.web.messaging.MessageBus;
+import com.transficc.tools.feedback.web.messaging.PublishableJob;
 
 public class Job
 {
@@ -25,18 +24,19 @@ public class Job
     private final String name;
     private final String url;
     private final int priority;
-    private volatile String revision = "";
-    private volatile JobStatus jobStatus;
-    private volatile JobStatus jobStatusToDisplay;
     private final boolean shouldDisplayCommentsForJob;
     private final VersionControl versionControl;
-    private volatile int buildNumber = 0;
-    private volatile double jobCompletionPercentage;
-    private volatile String[] comments = new String[0];
-    private volatile boolean building;
-    private volatile TestResults jobsTestResults;
-    private volatile long timestamp;
-    private volatile boolean hasJustCompleted;
+
+    private String revision = "";
+    private JobStatus jobStatus;
+    private JobStatus jobStatusToDisplay;
+    private int buildNumber = 0;
+    private double jobCompletionPercentage;
+    private String[] comments = new String[0];
+    private boolean building;
+    private TestResults jobsTestResults;
+    private long timestamp;
+    private boolean hasJustCompleted;
 
     public Job(final String name, final String url, final int priority, final JobStatus jobStatus, final boolean shouldDisplayCommentsForJob, final VersionControl versionControl)
     {
@@ -46,6 +46,34 @@ public class Job
         this.jobStatus = jobStatus;
         this.shouldDisplayCommentsForJob = shouldDisplayCommentsForJob;
         this.versionControl = versionControl;
+    }
+
+    public boolean wasUpdated(final LatestBuildInformation buildInformation)
+    {
+        final String revision = buildInformation.getRevision();
+        final JobStatus jobStatus = buildInformation.getJobStatus();
+        final int buildNumber = buildInformation.getNumber();
+        final long timestamp = buildInformation.getTimestamp();
+        final double jobCompletionPercentage = buildInformation.getJobCompletionPercentage();
+        final String[] comments = buildInformation.getComments();
+        final boolean building = buildInformation.isBuilding();
+        final TestResults testResults = buildInformation.getTestResults();
+        final boolean needsToBeUpdated = isThereAnUpdate(revision, jobStatus, buildNumber, jobCompletionPercentage, building);
+
+        if (needsToBeUpdated)
+        {
+            this.jobsTestResults = testResults;
+            this.revision = "".equals(revision) ? this.revision : revision;
+            this.jobStatus = jobStatus;
+            this.jobStatusToDisplay = jobStatus == JobStatus.BUILDING ? jobStatusToDisplay : jobStatus;
+            this.buildNumber = buildNumber;
+            this.timestamp = timestamp;
+            this.jobCompletionPercentage = jobCompletionPercentage;
+            this.comments = shouldDisplayCommentsForJob ? comments : NO_COMMENTS;
+            this.hasJustCompleted = this.building && !building;
+            this.building = building;
+        }
+        return needsToBeUpdated;
     }
 
     public void maybeUpdateAndPublish(final String revision, final JobStatus jobStatus, final int buildNumber, final long timestamp, final double jobCompletionPercentage, final MessageBus messageBus,

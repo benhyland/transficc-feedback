@@ -13,7 +13,7 @@
 package com.transficc.tools.feedback;
 
 import com.transficc.tools.feedback.dao.IterationDao;
-import com.transficc.tools.feedback.messaging.MessageBus;
+import com.transficc.tools.feedback.web.messaging.MessageBus;
 
 public class IterationRepository
 {

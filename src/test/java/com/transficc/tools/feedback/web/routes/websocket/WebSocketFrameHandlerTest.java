@@ -10,15 +10,15 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
  * OR CONDITIONS OF ANY KIND, either express or implied.  See the License for the specific language governing permissions and limitations under the License.
  */
-package com.transficc.tools.feedback.routes.websocket;
+package com.transficc.tools.feedback.web.routes.websocket;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.transficc.tools.feedback.domain.JobStatus;
-import com.transficc.tools.feedback.domain.Job;
 import com.transficc.tools.feedback.JobRepository;
-import com.transficc.tools.feedback.VersionControl;
+import com.transficc.tools.feedback.domain.Job;
+import com.transficc.tools.feedback.domain.JobStatus;
+import com.transficc.tools.feedback.domain.VersionControl;
 import com.transficc.tools.feedback.util.SafeSerialisation;
 
 import org.junit.Before;

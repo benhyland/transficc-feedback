@@ -10,7 +10,7 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
  * OR CONDITIONS OF ANY KIND, either express or implied.  See the License for the specific language governing permissions and limitations under the License.
  */
-package com.transficc.tools.feedback.jenkins;
+package com.transficc.tools.feedback.ci.jenkins;
 
 import java.io.IOException;
 import java.util.List;
@@ -26,12 +26,12 @@ import com.offbytwo.jenkins.model.BuildResult;
 import com.offbytwo.jenkins.model.BuildWithDetails;
 import com.offbytwo.jenkins.model.JobWithDetails;
 import com.transficc.functionality.Result;
-import com.transficc.tools.feedback.JobPrioritiesRepository;
-import com.transficc.tools.feedback.VersionControl;
+import com.transficc.tools.feedback.ci.JobPrioritiesRepository;
 import com.transficc.tools.feedback.domain.Job;
 import com.transficc.tools.feedback.domain.JobStatus;
 import com.transficc.tools.feedback.domain.LatestBuildInformation;
 import com.transficc.tools.feedback.domain.TestResults;
+import com.transficc.tools.feedback.domain.VersionControl;
 import com.transficc.tools.feedback.util.ClockService;
 
 import org.slf4j.Logger;

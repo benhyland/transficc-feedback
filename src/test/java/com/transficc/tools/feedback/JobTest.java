@@ -14,8 +14,9 @@ package com.transficc.tools.feedback;
 
 import com.transficc.tools.feedback.domain.Job;
 import com.transficc.tools.feedback.domain.JobStatus;
-import com.transficc.tools.feedback.messaging.MessageBus;
-import com.transficc.tools.feedback.messaging.PublishableJob;
+import com.transficc.tools.feedback.domain.VersionControl;
+import com.transficc.tools.feedback.web.messaging.MessageBus;
+import com.transficc.tools.feedback.web.messaging.PublishableJob;
 
 import org.junit.Before;
 import org.junit.Test;

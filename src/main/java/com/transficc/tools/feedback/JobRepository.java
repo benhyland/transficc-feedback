@@ -18,8 +18,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import com.transficc.tools.feedback.domain.Job;
-import com.transficc.tools.feedback.messaging.PublishableJob;
-import com.transficc.tools.feedback.routes.JobStatusSnapshot;
+import com.transficc.tools.feedback.web.messaging.PublishableJob;
+import com.transficc.tools.feedback.web.routes.JobStatusSnapshot;
 
 public class JobRepository implements JobStatusSnapshot
 {

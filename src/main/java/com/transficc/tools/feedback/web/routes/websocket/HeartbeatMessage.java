@@ -10,13 +10,16 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
  * OR CONDITIONS OF ANY KIND, either express or implied.  See the License for the specific language governing permissions and limitations under the License.
  */
-package com.transficc.tools.feedback.routes;
+package com.transficc.tools.feedback.web.routes.websocket;
 
-import java.util.List;
-
-import com.transficc.tools.feedback.messaging.PublishableJob;
-
-public interface JobStatusSnapshot
+public class HeartbeatMessage
 {
-    List<PublishableJob> getPublishableJobs();
+    private final long currentServerTime;
+    private final long serverStartUpTime;
+
+    public HeartbeatMessage(final long currentServerTime, final long serverStartUpTime)
+    {
+        this.currentServerTime = currentServerTime;
+        this.serverStartUpTime = serverStartUpTime;
+    }
 }

@@ -27,18 +27,21 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.offbytwo.jenkins.JenkinsServer;
+import com.transficc.tools.feedback.ci.JobFinder;
+import com.transficc.tools.feedback.ci.JobPrioritiesRepository;
+import com.transficc.tools.feedback.ci.JobService;
+import com.transficc.tools.feedback.ci.jenkins.JenkinsFacade;
 import com.transficc.tools.feedback.dao.IterationDao;
 import com.transficc.tools.feedback.dao.JobTestResultsDao;
-import com.transficc.tools.feedback.jenkins.JenkinsFacade;
-import com.transficc.tools.feedback.messaging.JobUpdateSubscriber;
-import com.transficc.tools.feedback.messaging.MessageBus;
-import com.transficc.tools.feedback.routes.Routes;
-import com.transficc.tools.feedback.routes.WebSocketPublisher;
-import com.transficc.tools.feedback.routes.websocket.OutboundWebSocketFrame;
 import com.transficc.tools.feedback.util.ClockService;
 import com.transficc.tools.feedback.util.FeedbackProperties;
 import com.transficc.tools.feedback.util.LoggingThreadFactory;
 import com.transficc.tools.feedback.util.SafeSerialisation;
+import com.transficc.tools.feedback.web.messaging.JobUpdateSubscriber;
+import com.transficc.tools.feedback.web.messaging.MessageBus;
+import com.transficc.tools.feedback.web.routes.Routes;
+import com.transficc.tools.feedback.web.routes.WebSocketPublisher;
+import com.transficc.tools.feedback.web.routes.websocket.OutboundWebSocketFrame;
 
 import org.flywaydb.core.Flyway;
 import org.h2.jdbcx.JdbcConnectionPool;
@@ -81,7 +84,7 @@ public class FeedbackMain
 
         final ThreadFactory threadFactory = new LoggingThreadFactory(SERVICE_NAME);
         final ExecutorService statusCheckerService = Executors.newFixedThreadPool(1, threadFactory);
-        final ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(4, threadFactory);
+        final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(threadFactory);
         statusCheckerService.submit(new JobUpdateSubscriber(messageQueue, webSocketPublisher));
         final MessageBus messageBus = new MessageBus(messageQueue);
         final JenkinsFacade jenkinsFacade = new JenkinsFacade(jenkins, new JobPrioritiesRepository(feedbackProperties.getJobsWithPriorities()), feedbackProperties.getMasterJobName(),

@@ -10,11 +10,11 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
  * OR CONDITIONS OF ANY KIND, either express or implied.  See the License for the specific language governing permissions and limitations under the License.
  */
-package com.transficc.tools.feedback.routes.websocket;
+package com.transficc.tools.feedback.web.routes.websocket;
 
-import com.transficc.tools.feedback.messaging.PublishableIteration;
-import com.transficc.tools.feedback.messaging.PublishableJob;
-import com.transficc.tools.feedback.messaging.PublishableStatus;
+import com.transficc.tools.feedback.web.messaging.PublishableIteration;
+import com.transficc.tools.feedback.web.messaging.PublishableJob;
+import com.transficc.tools.feedback.web.messaging.PublishableStatus;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 @SuppressFBWarnings(value = "URF_UNREAD_FIELD", justification = "Serialised object")

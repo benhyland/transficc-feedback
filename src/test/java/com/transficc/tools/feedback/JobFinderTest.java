@@ -23,12 +23,16 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import com.offbytwo.jenkins.JenkinsServer;
+import com.transficc.tools.feedback.ci.JobFinder;
+import com.transficc.tools.feedback.ci.JobPrioritiesRepository;
+import com.transficc.tools.feedback.ci.JobService;
+import com.transficc.tools.feedback.ci.jenkins.JenkinsFacade;
 import com.transficc.tools.feedback.dao.JobTestResultsDao;
 import com.transficc.tools.feedback.domain.JobStatus;
-import com.transficc.tools.feedback.jenkins.JenkinsFacade;
-import com.transficc.tools.feedback.messaging.MessageBus;
-import com.transficc.tools.feedback.messaging.PublishableJob;
-import com.transficc.tools.feedback.routes.websocket.OutboundWebSocketFrame;
+import com.transficc.tools.feedback.domain.VersionControl;
+import com.transficc.tools.feedback.web.messaging.MessageBus;
+import com.transficc.tools.feedback.web.messaging.PublishableJob;
+import com.transficc.tools.feedback.web.routes.websocket.OutboundWebSocketFrame;
 
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.Is;
