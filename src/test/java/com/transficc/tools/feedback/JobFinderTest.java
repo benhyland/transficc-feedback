@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.offbytwo.jenkins.JenkinsServer;
 import com.transficc.tools.feedback.dao.JobTestResultsDao;
+import com.transficc.tools.feedback.domain.JobStatus;
 import com.transficc.tools.feedback.jenkins.JenkinsFacade;
 import com.transficc.tools.feedback.messaging.MessageBus;
 import com.transficc.tools.feedback.messaging.PublishableJob;
@@ -39,9 +40,6 @@ import org.mockito.MockitoAnnotations;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-
-
-import com.transficc.tools.feedback.domain.JobStatus;
 
 public class JobFinderTest
 {
@@ -67,8 +65,8 @@ public class JobFinderTest
         final LinkedBlockingQueue<OutboundWebSocketFrame> messageBusQueue = new LinkedBlockingQueue<>();
         final MessageBus messageBus = new MessageBus(messageBusQueue);
         final JenkinsFacade jenkinsFacade = new JenkinsFacade(jenkins, new JobPrioritiesRepository(Collections.emptyMap()), "", () -> 10, VersionControl.GIT);
-        jobFinder = new JobFinder(new JobService(jobRepository, messageBus, scheduledExecutorService, new GetLatestJobBuildInformationFactory(jenkinsFacade, messageBus, new String[0],
-                                                                                                                                              jobTestResultsDao)),
+        jobFinder = new JobFinder(new JobService(jobRepository, messageBus, scheduledExecutorService,
+                                                 jenkinsFacade, new String[0], jobTestResultsDao),
                                   jenkinsFacade);
     }
 

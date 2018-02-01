@@ -27,7 +27,7 @@ public class JobFinder implements Runnable
     private final JobService jobService;
     private final JenkinsFacade jenkinsFacade;
 
-    public JobFinder(final JobService jobService, final JenkinsFacade jenkinsFacade)
+    JobFinder(final JobService jobService, final JenkinsFacade jenkinsFacade)
     {
         this.jobService = jobService;
         this.jenkinsFacade = jenkinsFacade;

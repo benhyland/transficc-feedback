@@ -12,13 +12,18 @@
  */
 package com.transficc.tools.feedback;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import com.transficc.tools.feedback.dao.JobTestResultsDao;
 import com.transficc.tools.feedback.domain.Job;
+import com.transficc.tools.feedback.jenkins.JenkinsFacade;
 import com.transficc.tools.feedback.messaging.MessageBus;
 
 public class JobService
@@ -27,15 +32,23 @@ public class JobService
     private final JobRepository jobRepository;
     private final MessageBus messageBus;
     private final ScheduledExecutorService scheduledExecutorService;
-    private final GetLatestJobBuildInformationFactory getLatestJobBuildInformationFactory;
+    private final JenkinsFacade jenkinsFacade;
+    private final JobTestResultsDao jobTestResultsDao;
+    private final Set<String> jobNamesForTestResultsToPersist;
 
-    public JobService(final JobRepository jobRepository, final MessageBus messageBus, final ScheduledExecutorService scheduledExecutorService,
-                      final GetLatestJobBuildInformationFactory getLatestJobBuildInformationFactory)
+    JobService(final JobRepository jobRepository,
+               final MessageBus messageBus,
+               final ScheduledExecutorService scheduledExecutorService,
+               final JenkinsFacade jenkinsFacade,
+               final String[] jobNamesForTestResultsToPersist, final JobTestResultsDao jobTestResultsDao)
     {
         this.jobRepository = jobRepository;
         this.messageBus = messageBus;
         this.scheduledExecutorService = scheduledExecutorService;
-        this.getLatestJobBuildInformationFactory = getLatestJobBuildInformationFactory;
+        this.jenkinsFacade = jenkinsFacade;
+        this.jobNamesForTestResultsToPersist = new HashSet<>(jobNamesForTestResultsToPersist.length);
+        this.jobTestResultsDao = jobTestResultsDao;
+        Collections.addAll(this.jobNamesForTestResultsToPersist, jobNamesForTestResultsToPersist);
     }
 
     public void onJobNotFound(final String jobName)
@@ -51,7 +64,8 @@ public class JobService
 
     public void add(final Job job)
     {
-        final GetLatestJobBuildInformation statusChecker = getLatestJobBuildInformationFactory.create(job, this);
+        final GetLatestJobBuildInformation statusChecker = new GetLatestJobBuildInformation(messageBus, this, job, jenkinsFacade, jobNamesForTestResultsToPersist.contains(job.getName()),
+                                                                                            jobTestResultsDao);
         final String jobName = job.getName();
         jobRepository.put(jobName, job);
         final ScheduledFuture<?> scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(statusChecker, 0, 5, TimeUnit.SECONDS);

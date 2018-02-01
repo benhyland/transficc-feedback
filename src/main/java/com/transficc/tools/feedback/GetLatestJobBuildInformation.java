@@ -99,8 +99,4 @@ public class GetLatestJobBuildInformation implements Runnable
         }
     }
 
-    boolean isShouldPersistTestResults()
-    {
-        return shouldPersistTestResults;
-    }
 }
