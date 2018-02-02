@@ -163,7 +163,7 @@ public class JenkinsFacade
         return null;
     }
 
-    private static JobStatus parse(final BuildResult result, final JobStatus previousStatus)
+    static JobStatus parse(final BuildResult result, final JobStatus previousStatus)
     {
         if (result == null)
         {
