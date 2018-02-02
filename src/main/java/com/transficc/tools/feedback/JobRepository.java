@@ -17,20 +17,20 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import com.transficc.tools.feedback.domain.Job;
+import com.transficc.tools.feedback.ci.FeedbackJob;
 import com.transficc.tools.feedback.web.messaging.PublishableJob;
 import com.transficc.tools.feedback.web.routes.JobStatusSnapshot;
 
 public class JobRepository implements JobStatusSnapshot
 {
-    private final Map<String, Job> jobNameToJob = new ConcurrentHashMap<>();
+    private final Map<String, FeedbackJob> jobNameToJob = new ConcurrentHashMap<>();
 
     @Override
     public List<PublishableJob> getPublishableJobs()
     {
         return jobNameToJob.values().
                 stream().
-                map(Job::createPublishable).
+                map(FeedbackJob::createPublishable).
                 sorted((job1, job2) ->
                        {
                            final int comparePriority = Integer.compare(job2.getPriority(), job1.getPriority());
@@ -45,7 +45,7 @@ public class JobRepository implements JobStatusSnapshot
         return jobNameToJob.containsKey(jobName);
     }
 
-    public void put(final String jobName, final Job job)
+    public void put(final String jobName, final FeedbackJob job)
     {
         jobNameToJob.put(jobName, job);
     }

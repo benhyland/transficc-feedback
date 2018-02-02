@@ -28,7 +28,6 @@ import com.offbytwo.jenkins.model.BuildWithDetails;
 import com.offbytwo.jenkins.model.JobWithDetails;
 import com.transficc.functionality.Result;
 import com.transficc.tools.feedback.MessageBuilder;
-import com.transficc.tools.feedback.ci.JobPrioritiesRepository;
 import com.transficc.tools.feedback.domain.JobStatus;
 import com.transficc.tools.feedback.domain.LatestBuildInformation;
 import com.transficc.tools.feedback.domain.TestResults;
@@ -51,7 +50,7 @@ public class JenkinsFacadeTest
     private final JenkinsServer jenkinsServer = Mockito.mock(JenkinsServer.class);
     private final JobWithDetails jobWithDetails = Mockito.mock(JobWithDetails.class);
     private final Build lastBuild = Mockito.mock(Build.class);
-    private final JenkinsFacade jenkinsFacade = new JenkinsFacade(jenkinsServer, new JobPrioritiesRepository(new HashMap<>()), "master job", new ClockService()
+    private final JenkinsFacade jenkinsFacade = new JenkinsFacade(jenkinsServer, "master job", new ClockService()
     {
         @Override
         public long currentTimeMillis()

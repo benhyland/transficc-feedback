@@ -14,72 +14,59 @@ package com.transficc.tools.feedback;
 
 import com.transficc.tools.feedback.domain.Job;
 import com.transficc.tools.feedback.domain.JobStatus;
+import com.transficc.tools.feedback.domain.LatestBuildInformation;
 import com.transficc.tools.feedback.domain.VersionControl;
-import com.transficc.tools.feedback.web.messaging.MessageBus;
 import com.transficc.tools.feedback.web.messaging.PublishableJob;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 public class JobTest
 {
-    @Mock
-    private MessageBus messageBus;
-    private final Job job = new Job("tom", "url", 3, JobStatus.SUCCESS, false, VersionControl.GIT);
+    private final Job job = new Job("tom", "url", JobStatus.SUCCESS, false, VersionControl.GIT);
 
     @Before
     public void setup()
     {
-        MockitoAnnotations.initMocks(this);
-        job.maybeUpdateAndPublish("revision1", JobStatus.SUCCESS, 1, 1468934838586L, 110, messageBus, new String[0], false, null);
-        verify(messageBus).sendUpdate(any(Job.class));
+        Assert.assertTrue(job.wasUpdated(new LatestBuildInformation("revision1", JobStatus.SUCCESS, 1, 1468934838586L, 110, new String[0], false, null, 0)));
     }
 
     @Test
     public void shouldNotPublishIfJobHasAlreadyCompleted()
     {
-        job.maybeUpdateAndPublish("revision1", JobStatus.SUCCESS, 1, 1468934838586L, 1120, messageBus, new String[0], false, null);
-        verifyNoMoreInteractions(messageBus);
+        Assert.assertFalse(job.wasUpdated(new LatestBuildInformation("revision1", JobStatus.SUCCESS, 1, 1468934838586L, 110, new String[0], false, null, 0)));
     }
 
     @Test
     public void shouldPublishIfANewRunHasStarted()
     {
-        job.maybeUpdateAndPublish("revision2", JobStatus.SUCCESS, 2, 1468934838586L, 0, messageBus, new String[0], false, null);
-        verify(messageBus, times(2)).sendUpdate(job);
+        Assert.assertTrue(job.wasUpdated(new LatestBuildInformation("revision2", JobStatus.SUCCESS, 2, 1468934838586L, 0, new String[0], false, null, 0)));
     }
 
     @Test
     public void shouldPublishIfAnUpdateForARunIsReceived()
     {
-        job.maybeUpdateAndPublish("revision2", JobStatus.SUCCESS, 2, 1468934838586L, 10, messageBus, new String[0], false, null);
-        job.maybeUpdateAndPublish("revision2", JobStatus.SUCCESS, 2, 1468934838586L, 20, messageBus, new String[0], false, null);
-        verify(messageBus, times(3)).sendUpdate(job);
+        Assert.assertTrue(job.wasUpdated(new LatestBuildInformation("revision2", JobStatus.SUCCESS, 2, 1468934838586L, 10, new String[0], false, null, 0)));
+        Assert.assertTrue(job.wasUpdated(new LatestBuildInformation("revision2", JobStatus.SUCCESS, 2, 1468934838586L, 20, new String[0], false, null, 0)));
     }
 
     @Test
     public void shouldPublishIfJobCompletes()
     {
-        job.maybeUpdateAndPublish("revision2", JobStatus.SUCCESS, 2, 1468934838586L, 10, messageBus, new String[0], false, null);
-        job.maybeUpdateAndPublish("revision2", JobStatus.SUCCESS, 2, 1468934838586L, 110, messageBus, new String[0], false, null);
-        verify(messageBus, times(3)).sendUpdate(job);
+        Assert.assertTrue(job.wasUpdated(new LatestBuildInformation("revision2", JobStatus.SUCCESS, 2, 1468934838586L, 10, new String[0], false, null, 0)));
+        Assert.assertTrue(job.wasUpdated(new LatestBuildInformation("revision2", JobStatus.SUCCESS, 2, 1468934838586L, 110, new String[0], false, null, 0)));
     }
 
     @Test
     public void shouldTruncateGitHashes()
     {
-        job.maybeUpdateAndPublish("revision21", JobStatus.SUCCESS, 2, 1468934838586L, 0, messageBus, new String[0], false, null);
+        Assert.assertTrue(job.wasUpdated(new LatestBuildInformation("revision21", JobStatus.SUCCESS, 2, 1468934838586L, 0, new String[0], false, null, 0)));
 
-        final PublishableJob publishable = job.createPublishable();
+        final PublishableJob publishable = job.createPublishable(1);
 
         assertThat(publishable.getRevision(), is("revisio"));
     }
@@ -87,10 +74,10 @@ public class JobTest
     @Test
     public void shouldNotTruncateRevisionIfVersionControlIsSvn()
     {
-        final Job job = new Job("tom", "url", 3, JobStatus.SUCCESS, false, VersionControl.SVN);
-        job.maybeUpdateAndPublish("revision21", JobStatus.SUCCESS, 2, 1468934838586L, 0, messageBus, new String[0], false, null);
+        final Job job = new Job("tom", "url", JobStatus.SUCCESS, false, VersionControl.SVN);
+        Assert.assertTrue(job.wasUpdated(new LatestBuildInformation("revision21", JobStatus.SUCCESS, 2, 1468934838586L, 0, new String[0], false, null, 0)));
 
-        final PublishableJob publishable = job.createPublishable();
+        final PublishableJob publishable = job.createPublishable(1);
 
         assertThat(publishable.getRevision(), is("revision21"));
     }
@@ -98,8 +85,8 @@ public class JobTest
     @Test
     public void shouldShouldReturnTrueIfJobWasPreviouslyBuilding()
     {
-        job.maybeUpdateAndPublish("revision2", JobStatus.SUCCESS, 2, 1468934838586L, 10, messageBus, new String[0], true, null);
-        job.maybeUpdateAndPublish("revision2", JobStatus.SUCCESS, 2, 1468934838586L, 10, messageBus, new String[0], false, null);
+        Assert.assertTrue(job.wasUpdated(new LatestBuildInformation("revision2", JobStatus.SUCCESS, 2, 1468934838586L, 10, new String[0], true, null, 0)));
+        Assert.assertTrue(job.wasUpdated(new LatestBuildInformation("revision2", JobStatus.SUCCESS, 2, 1468934838586L, 10, new String[0], false, null, 0)));
 
         final boolean isComplete = job.hasJustCompleted();
 
@@ -109,8 +96,8 @@ public class JobTest
     @Test
     public void shouldReturnFalseIfJobIsStillBuilding()
     {
-        job.maybeUpdateAndPublish("revision2", JobStatus.SUCCESS, 2, 1468934838586L, 10, messageBus, new String[0], true, null);
-        job.maybeUpdateAndPublish("revision2", JobStatus.SUCCESS, 2, 1468934838586L, 10, messageBus, new String[0], true, null);
+        Assert.assertTrue(job.wasUpdated(new LatestBuildInformation("revision2", JobStatus.SUCCESS, 2, 1468934838586L, 10, new String[0], true, null, 0)));
+        Assert.assertTrue(job.wasUpdated(new LatestBuildInformation("revision2", JobStatus.SUCCESS, 2, 1468934838586L, 30, new String[0], true, null, 0)));
 
         final boolean isComplete = job.hasJustCompleted();
 
@@ -120,8 +107,8 @@ public class JobTest
     @Test
     public void shouldReturnFalseIfTheJobHasJustStartedToBeBuilt()
     {
-        job.maybeUpdateAndPublish("revision2", JobStatus.SUCCESS, 2, 1468934838586L, 10, messageBus, new String[0], false, null);
-        job.maybeUpdateAndPublish("revision2", JobStatus.SUCCESS, 2, 1468934838586L, 10, messageBus, new String[0], true, null);
+        Assert.assertTrue(job.wasUpdated(new LatestBuildInformation("revision2", JobStatus.SUCCESS, 2, 1468934838586L, 10, new String[0], false, null, 0)));
+        Assert.assertTrue(job.wasUpdated(new LatestBuildInformation("revision2", JobStatus.SUCCESS, 2, 1468934838586L, 10, new String[0], true, null, 0)));
 
         final boolean isComplete = job.hasJustCompleted();
 

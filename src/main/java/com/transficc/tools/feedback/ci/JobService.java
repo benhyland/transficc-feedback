@@ -12,9 +12,6 @@
  */
 package com.transficc.tools.feedback.ci;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -22,29 +19,26 @@ import java.util.concurrent.TimeUnit;
 import com.transficc.tools.feedback.JobRepository;
 import com.transficc.tools.feedback.ci.jenkins.JenkinsFacade;
 import com.transficc.tools.feedback.dao.JobTestResultsDao;
-import com.transficc.tools.feedback.domain.Job;
 import com.transficc.tools.feedback.web.messaging.MessageBus;
 
 public class JobService
 {
     private final JobRepository jobRepository;
-    private final CopyOnWriteArrayList<Job> jobs;
+    private final CopyOnWriteArrayList<FeedbackJob> jobs;
 
     public JobService(final JobRepository jobRepository,
                       final MessageBus messageBus,
                       final ScheduledExecutorService scheduledExecutorService,
                       final JenkinsFacade jenkinsFacade,
-                      final String[] jobNamesForTestResultsToPersist, final JobTestResultsDao jobTestResultsDao)
+                      final JobTestResultsDao jobTestResultsDao)
     {
         this.jobRepository = jobRepository;
-        final Set<String> jobNamesForTestResultsToPersist1 = new HashSet<>(jobNamesForTestResultsToPersist.length);
-        Collections.addAll(jobNamesForTestResultsToPersist1, jobNamesForTestResultsToPersist);
         jobs = new CopyOnWriteArrayList<>();
-        final JobUpdater jobUpdaterRunnable = new JobUpdater(jenkinsFacade, jobTestResultsDao, jobs, jobNamesForTestResultsToPersist1, messageBus, jobRepository);
+        final JobUpdater jobUpdaterRunnable = new JobUpdater(jenkinsFacade, jobTestResultsDao, jobs, messageBus, jobRepository);
         scheduledExecutorService.scheduleAtFixedRate(jobUpdaterRunnable, 0, 5, TimeUnit.SECONDS);
     }
 
-    public void add(final Job job)
+    public void add(final FeedbackJob job)
     {
         jobs.add(job);
         final String jobName = job.getName();

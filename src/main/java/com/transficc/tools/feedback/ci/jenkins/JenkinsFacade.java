@@ -26,7 +26,6 @@ import com.offbytwo.jenkins.model.BuildResult;
 import com.offbytwo.jenkins.model.BuildWithDetails;
 import com.offbytwo.jenkins.model.JobWithDetails;
 import com.transficc.functionality.Result;
-import com.transficc.tools.feedback.ci.JobPrioritiesRepository;
 import com.transficc.tools.feedback.domain.Job;
 import com.transficc.tools.feedback.domain.JobStatus;
 import com.transficc.tools.feedback.domain.LatestBuildInformation;
@@ -41,19 +40,16 @@ public class JenkinsFacade
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(JenkinsFacade.class);
     private final JenkinsServer jenkins;
-    private final JobPrioritiesRepository jobPrioritiesRepository;
     private final String masterJobName;
     private final ClockService clockService;
     private final VersionControl versionControl;
 
     public JenkinsFacade(final JenkinsServer jenkins,
-                         final JobPrioritiesRepository jobPrioritiesRepository,
                          final String masterJobName,
                          final ClockService clockService,
                          final VersionControl versionControl)
     {
         this.jenkins = jenkins;
-        this.jobPrioritiesRepository = jobPrioritiesRepository;
         this.masterJobName = masterJobName;
         this.clockService = clockService;
         this.versionControl = versionControl;
@@ -67,7 +63,7 @@ public class JenkinsFacade
             return Result.success(jobs.values()
                                           .stream()
                                           .filter(job -> filter.test(job.getName()))
-                                          .map(job -> new Job(job.getName(), job.getUrl(), jobPrioritiesRepository.getPriorityForJob(job.getName()), JobStatus.DISABLED,
+                                          .map(job -> new Job(job.getName(), job.getUrl(), JobStatus.DISABLED,
                                                               masterJobName.equals(job.getName()), versionControl))
                                           .collect(Collectors.toList()));
         }

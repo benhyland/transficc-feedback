@@ -17,14 +17,12 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.transficc.functionality.Result;
 import com.transficc.tools.feedback.JobRepository;
 import com.transficc.tools.feedback.ci.jenkins.JenkinsFacade;
 import com.transficc.tools.feedback.dao.JobTestResultsDao;
-import com.transficc.tools.feedback.domain.Job;
 import com.transficc.tools.feedback.domain.LatestBuildInformation;
 import com.transficc.tools.feedback.domain.TestResults;
 import com.transficc.tools.feedback.web.messaging.MessageBus;
@@ -37,22 +35,19 @@ final class JobUpdater implements Runnable
     private static final Logger LOGGER = LoggerFactory.getLogger(JobUpdater.class);
     private final JenkinsFacade jenkinsFacade;
     private final JobTestResultsDao jobTestResultsDao;
-    private final CopyOnWriteArrayList<Job> jobs;
-    private final Set<String> jobNamesForTestResultsToPersist;
+    private final CopyOnWriteArrayList<FeedbackJob> jobs;
     private final MessageBus messageBus;
     private final JobRepository jobRepository;
 
     JobUpdater(final JenkinsFacade jenkinsFacade,
                final JobTestResultsDao jobTestResultsDao,
-               final CopyOnWriteArrayList<Job> jobs,
-               final Set<String> jobNamesForTestResultsToPersist,
+               final CopyOnWriteArrayList<FeedbackJob> jobs,
                final MessageBus messageBus,
                final JobRepository jobRepository)
     {
         this.jenkinsFacade = jenkinsFacade;
         this.jobTestResultsDao = jobTestResultsDao;
         this.jobs = jobs;
-        this.jobNamesForTestResultsToPersist = jobNamesForTestResultsToPersist;
         this.messageBus = messageBus;
         this.jobRepository = jobRepository;
     }
@@ -60,10 +55,10 @@ final class JobUpdater implements Runnable
     @Override
     public void run()
     {
-        final Iterator<Job> iterator = jobs.iterator();
+        final Iterator<FeedbackJob> iterator = jobs.iterator();
         while (iterator.hasNext())
         {
-            final Job job = iterator.next();
+            final FeedbackJob job = iterator.next();
             try
             {
                 final Result<Integer, LatestBuildInformation> latestBuildInformation = jenkinsFacade.getLatestBuildInformation(job.getName(), job.getJobStatus());
@@ -75,7 +70,7 @@ final class JobUpdater implements Runnable
                                                        messageBus.sendUpdate(job);
                                                    }
 
-                                                   if (job.hasJustCompleted() && shouldPersistJobResults(job))
+                                                   if (job.hasJustCompleted() && job.shouldPersistTestResults())
                                                    {
                                                        recordJobInformation(job, buildInformation);
                                                    }
@@ -88,7 +83,7 @@ final class JobUpdater implements Runnable
         }
     }
 
-    private void recordJobInformation(final Job job, final LatestBuildInformation buildInformation)
+    private void recordJobInformation(final FeedbackJob job, final LatestBuildInformation buildInformation)
     {
         final TestResults testResults = buildInformation.getTestResults();
         final int total = testResults.getFailCount() + testResults.getPassCount() + testResults.getSkipCount();
@@ -103,7 +98,7 @@ final class JobUpdater implements Runnable
                                          buildInformation.getDuration());
     }
 
-    private void handleErrorStatus(final Iterator<Job> iterator, final Job job, final Integer statusCode)
+    private void handleErrorStatus(final Iterator<FeedbackJob> iterator, final FeedbackJob job, final Integer statusCode)
     {
         if (statusCode == 404)
         {
@@ -115,10 +110,5 @@ final class JobUpdater implements Runnable
         {
             LOGGER.error("Received status code {} whilst trying to get build information for job: {}", statusCode, job.getName());
         }
-    }
-
-    private boolean shouldPersistJobResults(final Job job)
-    {
-        return jobNamesForTestResultsToPersist.contains(job.getName());
     }
 }

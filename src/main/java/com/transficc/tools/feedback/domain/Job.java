@@ -14,7 +14,6 @@ package com.transficc.tools.feedback.domain;
 
 import java.util.Arrays;
 
-import com.transficc.tools.feedback.web.messaging.MessageBus;
 import com.transficc.tools.feedback.web.messaging.PublishableJob;
 
 public class Job
@@ -23,7 +22,6 @@ public class Job
     private static final int GIT_HASH_LENGTH = 7;
     private final String name;
     private final String url;
-    private final int priority;
     private final boolean shouldDisplayCommentsForJob;
     private final VersionControl versionControl;
 
@@ -38,11 +36,10 @@ public class Job
     private long timestamp;
     private boolean hasJustCompleted;
 
-    public Job(final String name, final String url, final int priority, final JobStatus jobStatus, final boolean shouldDisplayCommentsForJob, final VersionControl versionControl)
+    public Job(final String name, final String url, final JobStatus jobStatus, final boolean shouldDisplayCommentsForJob, final VersionControl versionControl)
     {
         this.name = name;
         this.url = url;
-        this.priority = priority;
         this.jobStatus = jobStatus;
         this.shouldDisplayCommentsForJob = shouldDisplayCommentsForJob;
         this.versionControl = versionControl;
@@ -76,25 +73,6 @@ public class Job
         return needsToBeUpdated;
     }
 
-    public void maybeUpdateAndPublish(final String revision, final JobStatus jobStatus, final int buildNumber, final long timestamp, final double jobCompletionPercentage, final MessageBus messageBus,
-                                      final String[] comments, final boolean building, final TestResults jobsTestResults)
-    {
-        if (isThereAnUpdate(revision, jobStatus, buildNumber, jobCompletionPercentage, building))
-        {
-            this.jobsTestResults = jobsTestResults;
-            this.revision = "".equals(revision) ? this.revision : revision;
-            this.jobStatus = jobStatus;
-            this.jobStatusToDisplay = jobStatus == JobStatus.BUILDING ? jobStatusToDisplay : jobStatus;
-            this.buildNumber = buildNumber;
-            this.timestamp = timestamp;
-            this.jobCompletionPercentage = jobCompletionPercentage;
-            this.comments = shouldDisplayCommentsForJob ? comments : NO_COMMENTS;
-            this.hasJustCompleted = this.building && !building;
-            this.building = building;
-            messageBus.sendUpdate(this);
-        }
-    }
-
     public String getName()
     {
         return name;
@@ -105,7 +83,7 @@ public class Job
         return jobStatus;
     }
 
-    public PublishableJob createPublishable()
+    public PublishableJob createPublishable(final int priority)
     {
         final String revision = calculateRevision();
         return new PublishableJob(name, url, priority, revision, jobStatus, jobStatusToDisplay, buildNumber, timestamp, jobCompletionPercentage, comments, building, jobsTestResults);
@@ -138,7 +116,6 @@ public class Job
         return "Job{" +
                "name='" + name + '\'' +
                ", url='" + url + '\'' +
-               ", priority=" + priority +
                ", revision='" + revision + '\'' +
                ", jobStatus=" + jobStatus +
                ", buildNumber=" + buildNumber +

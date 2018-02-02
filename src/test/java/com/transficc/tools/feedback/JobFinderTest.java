@@ -15,6 +15,7 @@ package com.transficc.tools.feedback;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -68,10 +69,10 @@ public class JobFinderTest
         jobRepository = new JobRepository();
         final LinkedBlockingQueue<OutboundWebSocketFrame> messageBusQueue = new LinkedBlockingQueue<>();
         final MessageBus messageBus = new MessageBus(messageBusQueue);
-        final JenkinsFacade jenkinsFacade = new JenkinsFacade(jenkins, new JobPrioritiesRepository(Collections.emptyMap()), "", () -> 10, VersionControl.GIT);
+        final JenkinsFacade jenkinsFacade = new JenkinsFacade(jenkins, "", () -> 10, VersionControl.GIT);
         jobFinder = new JobFinder(new JobService(jobRepository, messageBus, scheduledExecutorService,
-                                                 jenkinsFacade, new String[0], jobTestResultsDao),
-                                  jenkinsFacade);
+                                                 jenkinsFacade, jobTestResultsDao),
+                                  jenkinsFacade, new JobPrioritiesRepository(Collections.emptyMap()), new HashSet<>());
     }
 
     @SuppressWarnings("unchecked")

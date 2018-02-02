@@ -14,7 +14,7 @@ package com.transficc.tools.feedback.web.messaging;
 
 import java.util.concurrent.BlockingQueue;
 
-import com.transficc.tools.feedback.domain.Job;
+import com.transficc.tools.feedback.ci.FeedbackJob;
 import com.transficc.tools.feedback.web.routes.websocket.OutboundWebSocketFrame;
 
 public class MessageBus
@@ -26,7 +26,7 @@ public class MessageBus
         this.messages = messages;
     }
 
-    public void sendUpdate(final Job job)
+    public void sendUpdate(final FeedbackJob job)
     {
         offer(OutboundWebSocketFrame.jobUpdate(job.createPublishable()));
     }

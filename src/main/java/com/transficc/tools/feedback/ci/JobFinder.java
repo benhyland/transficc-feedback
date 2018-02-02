@@ -13,6 +13,7 @@
 package com.transficc.tools.feedback.ci;
 
 import java.util.List;
+import java.util.Set;
 
 import com.transficc.functionality.Result;
 import com.transficc.tools.feedback.ci.jenkins.JenkinsFacade;
@@ -26,11 +27,18 @@ public class JobFinder implements Runnable
     private static final Logger LOGGER = LoggerFactory.getLogger(JobFinder.class);
     private final JobService jobService;
     private final JenkinsFacade jenkinsFacade;
+    private final JobPrioritiesRepository jobPrioritiesRepository;
+    private final Set<String> jobNamesForTestResultsToPersist;
 
-    public JobFinder(final JobService jobService, final JenkinsFacade jenkinsFacade)
+    public JobFinder(final JobService jobService,
+                     final JenkinsFacade jenkinsFacade,
+                     final JobPrioritiesRepository jobPrioritiesRepository,
+                     final Set<String> jobNamesForTestResultsToPersist)
     {
         this.jobService = jobService;
         this.jenkinsFacade = jenkinsFacade;
+        this.jobPrioritiesRepository = jobPrioritiesRepository;
+        this.jobNamesForTestResultsToPersist = jobNamesForTestResultsToPersist;
     }
 
     @Override
@@ -38,6 +46,10 @@ public class JobFinder implements Runnable
     {
         final Result<Integer, List<Job>> result = jenkinsFacade.getAllJobs(name -> !jobService.jobExists(name));
         result.consume(statusCode -> LOGGER.error("Received status code {} when trying to obtain jobs", statusCode),
-                       jobs -> jobs.forEach(jobService::add));
+                       jobs -> jobs.forEach(job ->
+                                            {
+                                                jobService.add(new FeedbackJob(jobPrioritiesRepository.getPriorityForJob(job.getName()),
+                                                                               jobNamesForTestResultsToPersist.contains(job.getName()), job));
+                                            }));
     }
 }

@@ -1,12 +1,9 @@
 package com.transficc.tools.feedback.ci;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.transficc.functionality.Result;
@@ -21,7 +18,6 @@ import com.transficc.tools.feedback.domain.VersionControl;
 import com.transficc.tools.feedback.web.messaging.MessageBus;
 import com.transficc.tools.feedback.web.messaging.PublishableJob;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -41,23 +37,17 @@ public class JobUpdaterTest
     private static final JobStatus CURRENT_JOB_STATUS = JobStatus.SUCCESS;
     private final JenkinsFacade jenkinsFacade = Mockito.mock(JenkinsFacade.class);
     private final JobTestResultsDao jobTestResultsDao = Mockito.mock(JobTestResultsDao.class);
-    private final CopyOnWriteArrayList<Job> jobs = new CopyOnWriteArrayList<>();
-    private final Set<String> jobNamesForTestResultsToPersist = new HashSet<>();
+    private final CopyOnWriteArrayList<FeedbackJob> jobs = new CopyOnWriteArrayList<>();
     private final MessageBus messageBus = Mockito.mock(MessageBus.class);
     private final JobRepository jobRepository = Mockito.mock(JobRepository.class);
-    private final Job job = new Job(JOB_NAME, JOB_URL, 0, CURRENT_JOB_STATUS, false, VersionControl.GIT);
-    private final JobUpdater jobUpdater = new JobUpdater(jenkinsFacade, jobTestResultsDao, jobs, jobNamesForTestResultsToPersist, messageBus, jobRepository);
-
-    @Before
-    public void setUp()
-    {
-        jobs.add(job);
-    }
+    private final FeedbackJob feedbackJob = new FeedbackJob(1, false, new Job(JOB_NAME, JOB_URL, CURRENT_JOB_STATUS, false, VersionControl.GIT));
+    private final JobUpdater jobUpdater = new JobUpdater(jenkinsFacade, jobTestResultsDao, jobs, messageBus, jobRepository);
 
     @Test
     public void shouldPushJobUpdateToMessageBus()
     {
         //Given
+        jobs.add(feedbackJob);
         final JobStatus expectedStatus = JobStatus.SUCCESS;
         final String expectedRevision = "5435dsd";
         final int expectedBuildNumber = 0;
@@ -73,15 +63,16 @@ public class JobUpdaterTest
         jobUpdater.run();
 
         //Then
-        verify(messageBus).sendUpdate(job);
+        verify(messageBus).sendUpdate(feedbackJob);
         verifyZeroInteractions(jobTestResultsDao);
-        assertJob(job, expectedRevision, expectedStatus, expectedBuildNumber, expectedTimestamp, expectedCompletionPercentage, comments, expectedTestResults);
+        assertJob(feedbackJob, expectedRevision, expectedStatus, expectedBuildNumber, expectedTimestamp, expectedCompletionPercentage, comments, expectedTestResults);
     }
 
     @Test
     public void shouldNotPublishAnUpdateIfNothingHasChanged()
     {
         //Given
+        jobs.add(feedbackJob);
         final LatestBuildInformation buildUpdate = new LatestBuildInformation("", JobStatus.SUCCESS, 0, 10L, 0, new String[0], false, null, 0);
         given(jenkinsFacade.getLatestBuildInformation(JOB_NAME, CURRENT_JOB_STATUS)).willReturn(Result.success(buildUpdate));
 
@@ -90,13 +81,14 @@ public class JobUpdaterTest
 
         //Then
         verifyZeroInteractions(messageBus);
-        assertJob(job, "", JobStatus.SUCCESS, 0, 0, 0, new String[0], null);
+        assertJob(feedbackJob, "", JobStatus.SUCCESS, 0, 0, 0, new String[0], null);
     }
 
     @Test
     public void shouldRemoveJobIfNotFoundOnCIServer()
     {
         //Given
+        jobs.add(feedbackJob);
         given(jenkinsFacade.getLatestBuildInformation(JOB_NAME, CURRENT_JOB_STATUS)).willReturn(Result.error(404));
 
         //When
@@ -111,6 +103,7 @@ public class JobUpdaterTest
     public void shouldDoNothingIfJobDoesNotHaveABuild()
     {
         //Given
+        jobs.add(feedbackJob);
         given(jenkinsFacade.getLatestBuildInformation(JOB_NAME, CURRENT_JOB_STATUS)).willReturn(Result.error(400));
 
         //When
@@ -124,7 +117,8 @@ public class JobUpdaterTest
     public void shouldPersistTestResultsIfJobJustCompletedAndHasPersistenceEnabled()
     {
         //Given
-        jobNamesForTestResultsToPersist.add(JOB_NAME);
+        final FeedbackJob feedbackJob = new FeedbackJob(1, true, new Job(JOB_NAME, JOB_URL, CURRENT_JOB_STATUS, false, VersionControl.GIT));
+        jobs.add(feedbackJob);
         final JobStatus expectedStatus = JobStatus.SUCCESS;
         final String expectedRevision = "5435dsd";
         final int expectedBuildNumber = 0;
@@ -144,16 +138,17 @@ public class JobUpdaterTest
         jobUpdater.run();
 
         //Then
-        verify(messageBus, times(2)).sendUpdate(job);
+        verify(messageBus, times(2)).sendUpdate(feedbackJob);
         verify(jobTestResultsDao).addTestResults(JOB_NAME, expectedRevision, 4, 1, 1, ZonedDateTime.of(LocalDateTime.ofInstant(Instant.ofEpochMilli(expectedTimestamp),
                                                                                                                                ZoneOffset.UTC), ZoneOffset.UTC), 0);
-        assertJob(job, expectedRevision, expectedStatus, expectedBuildNumber, expectedTimestamp, expectedCompletionPercentage, comments, expectedTestResults);
+        assertJob(feedbackJob, expectedRevision, expectedStatus, expectedBuildNumber, expectedTimestamp, expectedCompletionPercentage, comments, expectedTestResults);
     }
 
     @Test
     public void shouldNotPersistTestResultsIfJobJustCompletedAndDoesNotPersistenceEnabled()
     {
         //Given
+        jobs.add(feedbackJob);
         final JobStatus expectedStatus = JobStatus.SUCCESS;
         final String expectedRevision = "5435dsd";
         final int expectedBuildNumber = 0;
@@ -173,16 +168,17 @@ public class JobUpdaterTest
         jobUpdater.run();
 
         //Then
-        verify(messageBus, times(2)).sendUpdate(job);
+        verify(messageBus, times(2)).sendUpdate(feedbackJob);
         verifyZeroInteractions(jobTestResultsDao);
-        assertJob(job, expectedRevision, expectedStatus, expectedBuildNumber, expectedTimestamp, expectedCompletionPercentage, comments, expectedTestResults);
+        assertJob(feedbackJob, expectedRevision, expectedStatus, expectedBuildNumber, expectedTimestamp, expectedCompletionPercentage, comments, expectedTestResults);
     }
 
     @Test
-    public void shouldNotPersistTestResultsIfJobHasNotJustCompletedAndHasPersistenceEnabled() throws IOException
+    public void shouldNotPersistTestResultsIfJobHasNotJustCompletedAndHasPersistenceEnabled()
     {
         //Given
-        jobNamesForTestResultsToPersist.add(JOB_NAME);
+        final FeedbackJob feedbackJob = new FeedbackJob(1, true, new Job(JOB_NAME, JOB_URL, CURRENT_JOB_STATUS, false, VersionControl.GIT));
+        jobs.add(feedbackJob);
         final JobStatus expectedStatus = JobStatus.SUCCESS;
         final String expectedRevision = "5435dsd";
         final int expectedBuildNumber = 0;
@@ -202,15 +198,16 @@ public class JobUpdaterTest
         jobUpdater.run();
 
         //Then
-        verify(messageBus).sendUpdate(job);
+        verify(messageBus).sendUpdate(feedbackJob);
         verifyZeroInteractions(jobTestResultsDao);
-        assertJob(job, expectedRevision, expectedStatus, expectedBuildNumber, expectedTimestamp, expectedCompletionPercentage, comments, expectedTestResults);
+        assertJob(feedbackJob, expectedRevision, expectedStatus, expectedBuildNumber, expectedTimestamp, expectedCompletionPercentage, comments, expectedTestResults);
     }
 
     @Test
-    public void shouldNotPersistTestResultsIfJobHasNotJustCompletedAndDoesNotHavePersistenceEnabled() throws IOException
+    public void shouldNotPersistTestResultsIfJobHasNotJustCompletedAndDoesNotHavePersistenceEnabled()
     {
         //Given
+        jobs.add(feedbackJob);
         final JobStatus expectedStatus = JobStatus.SUCCESS;
         final String expectedRevision = "5435dsd";
         final int expectedBuildNumber = 0;
@@ -230,44 +227,17 @@ public class JobUpdaterTest
         jobUpdater.run();
 
         //Then
-        verify(messageBus).sendUpdate(job);
+        verify(messageBus).sendUpdate(feedbackJob);
         verifyZeroInteractions(jobTestResultsDao);
-        assertJob(job, expectedRevision, expectedStatus, expectedBuildNumber, expectedTimestamp, expectedCompletionPercentage, comments, expectedTestResults);
+        assertJob(feedbackJob, expectedRevision, expectedStatus, expectedBuildNumber, expectedTimestamp, expectedCompletionPercentage, comments, expectedTestResults);
     }
 
     @Test
-    public void shouldNotPersistTestResultsIfJobHasJustStartedAndHasPersistenceEnabled() throws IOException
+    public void shouldNotPersistTestResultsIfJobHasJustStartedAndHasPersistenceEnabled()
     {
         //Given
-        jobNamesForTestResultsToPersist.add(JOB_NAME);
-        final JobStatus expectedStatus = JobStatus.SUCCESS;
-        final String expectedRevision = "5435dsd";
-        final int expectedBuildNumber = 0;
-        final long expectedTimestamp = 5L;
-        final double expectedCompletionPercentage = 100.0;
-        final String[] comments = new String[0];
-        final TestResults expectedTestResults = new TestResults(1, 1, 2);
-        final LatestBuildInformation buildUpdate1 = new LatestBuildInformation(expectedRevision, expectedStatus, expectedBuildNumber, expectedTimestamp, expectedCompletionPercentage, comments,
-                                                                               false, expectedTestResults, 0);
-        final LatestBuildInformation buildUpdate2 = new LatestBuildInformation(expectedRevision, expectedStatus, expectedBuildNumber, expectedTimestamp, expectedCompletionPercentage, comments,
-                                                                               true, expectedTestResults, 0);
-        given(jenkinsFacade.getLatestBuildInformation(JOB_NAME, CURRENT_JOB_STATUS)).willReturn(Result.success(buildUpdate1),
-                                                                                                Result.success(buildUpdate2));
-
-        //When
-        jobUpdater.run();
-        jobUpdater.run();
-
-        //Then
-        verify(messageBus, times(2)).sendUpdate(job);
-        verifyZeroInteractions(jobTestResultsDao);
-        assertJob(job, expectedRevision, expectedStatus, expectedBuildNumber, expectedTimestamp, expectedCompletionPercentage, comments, expectedTestResults);
-    }
-
-    @Test
-    public void shouldNotPersistTestResultsIfJobHasJustStartedAndDoesNotHavePersistenceEnabled() throws IOException
-    {
-        //Given
+        final FeedbackJob feedbackJob = new FeedbackJob(1, false, new Job(JOB_NAME, JOB_URL, CURRENT_JOB_STATUS, false, VersionControl.GIT));
+        jobs.add(feedbackJob);
         final JobStatus expectedStatus = JobStatus.SUCCESS;
         final String expectedRevision = "5435dsd";
         final int expectedBuildNumber = 0;
@@ -287,12 +257,41 @@ public class JobUpdaterTest
         jobUpdater.run();
 
         //Then
-        verify(messageBus, times(2)).sendUpdate(job);
+        verify(messageBus, times(2)).sendUpdate(feedbackJob);
         verifyZeroInteractions(jobTestResultsDao);
-        assertJob(job, expectedRevision, expectedStatus, expectedBuildNumber, expectedTimestamp, expectedCompletionPercentage, comments, expectedTestResults);
+        assertJob(feedbackJob, expectedRevision, expectedStatus, expectedBuildNumber, expectedTimestamp, expectedCompletionPercentage, comments, expectedTestResults);
     }
 
-    private void assertJob(final Job job,
+    @Test
+    public void shouldNotPersistTestResultsIfJobHasJustStartedAndDoesNotHavePersistenceEnabled()
+    {
+        //Given
+        jobs.add(feedbackJob);
+        final JobStatus expectedStatus = JobStatus.SUCCESS;
+        final String expectedRevision = "5435dsd";
+        final int expectedBuildNumber = 0;
+        final long expectedTimestamp = 5L;
+        final double expectedCompletionPercentage = 100.0;
+        final String[] comments = new String[0];
+        final TestResults expectedTestResults = new TestResults(1, 1, 2);
+        final LatestBuildInformation buildUpdate1 = new LatestBuildInformation(expectedRevision, expectedStatus, expectedBuildNumber, expectedTimestamp, expectedCompletionPercentage, comments,
+                                                                               false, expectedTestResults, 0);
+        final LatestBuildInformation buildUpdate2 = new LatestBuildInformation(expectedRevision, expectedStatus, expectedBuildNumber, expectedTimestamp, expectedCompletionPercentage, comments,
+                                                                               true, expectedTestResults, 0);
+        given(jenkinsFacade.getLatestBuildInformation(JOB_NAME, CURRENT_JOB_STATUS)).willReturn(Result.success(buildUpdate1),
+                                                                                                Result.success(buildUpdate2));
+
+        //When
+        jobUpdater.run();
+        jobUpdater.run();
+
+        //Then
+        verify(messageBus, times(2)).sendUpdate(feedbackJob);
+        verifyZeroInteractions(jobTestResultsDao);
+        assertJob(feedbackJob, expectedRevision, expectedStatus, expectedBuildNumber, expectedTimestamp, expectedCompletionPercentage, comments, expectedTestResults);
+    }
+
+    private void assertJob(final FeedbackJob job,
                            final String expectedRevision,
                            final JobStatus expectedStatus,
                            final int expectedBuildNumber,
