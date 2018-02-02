@@ -13,7 +13,6 @@
 package com.transficc.tools.feedback.ci;
 
 import java.util.List;
-import java.util.Set;
 
 import com.transficc.functionality.Result;
 import com.transficc.tools.feedback.ci.jenkins.JenkinsFacade;
@@ -28,17 +27,14 @@ public class JobFinder implements Runnable
     private final JobService jobService;
     private final JenkinsFacade jenkinsFacade;
     private final JobPrioritiesRepository jobPrioritiesRepository;
-    private final Set<String> jobNamesForTestResultsToPersist;
 
     public JobFinder(final JobService jobService,
                      final JenkinsFacade jenkinsFacade,
-                     final JobPrioritiesRepository jobPrioritiesRepository,
-                     final Set<String> jobNamesForTestResultsToPersist)
+                     final JobPrioritiesRepository jobPrioritiesRepository)
     {
         this.jobService = jobService;
         this.jenkinsFacade = jenkinsFacade;
         this.jobPrioritiesRepository = jobPrioritiesRepository;
-        this.jobNamesForTestResultsToPersist = jobNamesForTestResultsToPersist;
     }
 
     @Override
@@ -49,7 +45,7 @@ public class JobFinder implements Runnable
                        jobs -> jobs.forEach(job ->
                                             {
                                                 jobService.add(new FeedbackJob(jobPrioritiesRepository.getPriorityForJob(job.getName()),
-                                                                               jobNamesForTestResultsToPersist.contains(job.getName()), job));
+                                                                               job));
                                             }));
     }
 }

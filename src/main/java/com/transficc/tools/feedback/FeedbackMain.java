@@ -14,10 +14,7 @@ package com.transficc.tools.feedback;
 
 import java.io.File;
 import java.net.URI;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -35,7 +32,6 @@ import com.transficc.tools.feedback.ci.JobPrioritiesRepository;
 import com.transficc.tools.feedback.ci.JobService;
 import com.transficc.tools.feedback.ci.jenkins.JenkinsFacade;
 import com.transficc.tools.feedback.dao.IterationDao;
-import com.transficc.tools.feedback.dao.JobTestResultsDao;
 import com.transficc.tools.feedback.util.ClockService;
 import com.transficc.tools.feedback.util.FeedbackProperties;
 import com.transficc.tools.feedback.util.LoggingThreadFactory;
@@ -92,15 +88,12 @@ public class FeedbackMain
         final MessageBus messageBus = new MessageBus(messageQueue);
         final JenkinsFacade jenkinsFacade = new JenkinsFacade(jenkins, feedbackProperties.getMasterJobName(),
                                                               clockService, feedbackProperties.getVersionControl());
-        final JobTestResultsDao jobTestResultsDao = new JobTestResultsDao(dataSource);
         final JobService jobService = new JobService(jobRepository, messageBus, scheduledExecutorService,
-                                                     jenkinsFacade,
-                                                     jobTestResultsDao);
+                                                     jenkinsFacade
+        );
         final IterationRepository iterationRepository = new IterationRepository(messageBus, new IterationDao(dataSource));
         Routes.setup(server, jobRepository, iterationRepository, new BreakingNewsService(messageBus), webSocketPublisher, Router.router(vertx), startUpTime);
-        final Set<String> jobNamesForTestResultsToPersist = new HashSet<>(feedbackProperties.getJobNamesForTestResultsToPersist().length);
-        Collections.addAll(jobNamesForTestResultsToPersist, feedbackProperties.getJobNamesForTestResultsToPersist());
-        final JobFinder jobFinder = new JobFinder(jobService, jenkinsFacade, new JobPrioritiesRepository(feedbackProperties.getJobsWithPriorities()), jobNamesForTestResultsToPersist);
+        final JobFinder jobFinder = new JobFinder(jobService, jenkinsFacade, new JobPrioritiesRepository(feedbackProperties.getJobsWithPriorities()));
 
         scheduledExecutorService.scheduleAtFixedRate(jobFinder, 0, 5, TimeUnit.MINUTES);
         server.listen(feedbackProperties.getFeedbackPort());

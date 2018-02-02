@@ -15,7 +15,6 @@ package com.transficc.tools.feedback;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -28,7 +27,6 @@ import com.transficc.tools.feedback.ci.JobFinder;
 import com.transficc.tools.feedback.ci.JobPrioritiesRepository;
 import com.transficc.tools.feedback.ci.JobService;
 import com.transficc.tools.feedback.ci.jenkins.JenkinsFacade;
-import com.transficc.tools.feedback.dao.JobTestResultsDao;
 import com.transficc.tools.feedback.domain.JobStatus;
 import com.transficc.tools.feedback.domain.VersionControl;
 import com.transficc.tools.feedback.web.messaging.MessageBus;
@@ -52,8 +50,6 @@ public class JobFinderTest
     private JenkinsServer jenkins;
     @Mock
     private ScheduledExecutorService scheduledExecutorService;
-    @Mock
-    private JobTestResultsDao jobTestResultsDao;
     @SuppressWarnings("rawtypes")
     @Mock
     private ScheduledFuture scheduledFuture;
@@ -71,8 +67,8 @@ public class JobFinderTest
         final MessageBus messageBus = new MessageBus(messageBusQueue);
         final JenkinsFacade jenkinsFacade = new JenkinsFacade(jenkins, "", () -> 10, VersionControl.GIT);
         jobFinder = new JobFinder(new JobService(jobRepository, messageBus, scheduledExecutorService,
-                                                 jenkinsFacade, jobTestResultsDao),
-                                  jenkinsFacade, new JobPrioritiesRepository(Collections.emptyMap()), new HashSet<>());
+                                                 jenkinsFacade),
+                                  jenkinsFacade, new JobPrioritiesRepository(Collections.emptyMap()));
     }
 
     @SuppressWarnings("unchecked")

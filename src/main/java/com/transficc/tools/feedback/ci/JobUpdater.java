@@ -12,19 +12,13 @@
  */
 package com.transficc.tools.feedback.ci;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.Iterator;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.transficc.functionality.Result;
 import com.transficc.tools.feedback.JobRepository;
 import com.transficc.tools.feedback.ci.jenkins.JenkinsFacade;
-import com.transficc.tools.feedback.dao.JobTestResultsDao;
 import com.transficc.tools.feedback.domain.LatestBuildInformation;
-import com.transficc.tools.feedback.domain.TestResults;
 import com.transficc.tools.feedback.web.messaging.MessageBus;
 
 import org.slf4j.Logger;
@@ -34,19 +28,16 @@ final class JobUpdater implements Runnable
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobUpdater.class);
     private final JenkinsFacade jenkinsFacade;
-    private final JobTestResultsDao jobTestResultsDao;
     private final CopyOnWriteArrayList<FeedbackJob> jobs;
     private final MessageBus messageBus;
     private final JobRepository jobRepository;
 
     JobUpdater(final JenkinsFacade jenkinsFacade,
-               final JobTestResultsDao jobTestResultsDao,
                final CopyOnWriteArrayList<FeedbackJob> jobs,
                final MessageBus messageBus,
                final JobRepository jobRepository)
     {
         this.jenkinsFacade = jenkinsFacade;
-        this.jobTestResultsDao = jobTestResultsDao;
         this.jobs = jobs;
         this.messageBus = messageBus;
         this.jobRepository = jobRepository;
@@ -69,11 +60,6 @@ final class JobUpdater implements Runnable
                                                    {
                                                        messageBus.sendUpdate(job);
                                                    }
-
-                                                   if (job.hasJustCompleted() && job.shouldPersistTestResults())
-                                                   {
-                                                       recordJobInformation(job, buildInformation);
-                                                   }
                                                });
             }
             catch (final RuntimeException e)
@@ -81,21 +67,6 @@ final class JobUpdater implements Runnable
                 LOGGER.error("An exception occurred whilst trying to gather build information", e);
             }
         }
-    }
-
-    private void recordJobInformation(final FeedbackJob job, final LatestBuildInformation buildInformation)
-    {
-        final TestResults testResults = buildInformation.getTestResults();
-        final int total = testResults.getFailCount() + testResults.getPassCount() + testResults.getSkipCount();
-        final ZonedDateTime startTime = ZonedDateTime.of(LocalDateTime.ofInstant(Instant.ofEpochMilli(buildInformation.getTimestamp()),
-                                                                                 ZoneOffset.UTC), ZoneOffset.UTC);
-        jobTestResultsDao.addTestResults(job.getName(),
-                                         buildInformation.getRevision(),
-                                         total,
-                                         testResults.getPassCount(),
-                                         testResults.getFailCount(),
-                                         startTime,
-                                         buildInformation.getDuration());
     }
 
     private void handleErrorStatus(final Iterator<FeedbackJob> iterator, final FeedbackJob job, final Integer statusCode)

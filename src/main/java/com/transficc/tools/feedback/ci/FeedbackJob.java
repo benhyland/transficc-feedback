@@ -8,13 +8,11 @@ import com.transficc.tools.feedback.web.messaging.PublishableJob;
 public class FeedbackJob
 {
     private final int priority;
-    private final boolean shouldPersistTestResults;
     private final Job job;
 
-    public FeedbackJob(final int priority, final boolean shouldPersistTestResults, final Job job)
+    public FeedbackJob(final int priority, final Job job)
     {
         this.priority = priority;
-        this.shouldPersistTestResults = shouldPersistTestResults;
         this.job = job;
     }
 
@@ -38,13 +36,4 @@ public class FeedbackJob
         return job.wasUpdated(latestBuildInformation);
     }
 
-    public boolean hasJustCompleted()
-    {
-        return job.hasJustCompleted();
-    }
-
-    public boolean shouldPersistTestResults()
-    {
-        return shouldPersistTestResults;
-    }
 }

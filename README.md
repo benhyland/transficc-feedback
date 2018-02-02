@@ -36,7 +36,6 @@ for the jar when running. The following properties are available for configurati
 - `feedback.job.priority` the priority of the jobs listed above, ranked in descending order (the higher the number, the higher the given job appears on the Feedback GUI). Note that 1 is reserved for jobs that have not been prioritised (Note in the above screenshot the values are feedback.job.priority=5,4,3,2)
 - `feedback.job.master` the name of your master commit job (usually unit tests, checkstyle, archiving). This job will have commit messages displayed (Note in the above screenshot the value is feedback.job.master=master-commit)
 - `feedback.versioncontrol` states what version control software you are using (only Git and SVN currently supported)
-- `feedback.test.job-test` list of job names whose test results should be persisted to allow for test analytics
 
 ### Our Configuration
 
@@ -49,7 +48,6 @@ feedback.job.name=master-commit,integration-test,acceptance-test,venue-compatibi
 feedback.job.priority=5,4,3,2
 feedback.job.master=master-commit
 feedback.versioncontrol=GIT
-feedback.test.job=acceptance-test
 ```
 
 

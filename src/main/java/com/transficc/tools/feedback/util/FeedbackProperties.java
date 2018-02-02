@@ -90,11 +90,6 @@ public class FeedbackProperties
         return VersionControl.valueOf(properties.getProperty("feedback.versioncontrol").toUpperCase());
     }
 
-    public String[] getJobNamesForTestResultsToPersist()
-    {
-        return getArrayProperty("feedback.test.job");
-    }
-
     private int getInteger(final String key)
     {
         return Integer.parseInt(properties.getProperty(key));

@@ -18,7 +18,6 @@ import java.util.concurrent.TimeUnit;
 
 import com.transficc.tools.feedback.JobRepository;
 import com.transficc.tools.feedback.ci.jenkins.JenkinsFacade;
-import com.transficc.tools.feedback.dao.JobTestResultsDao;
 import com.transficc.tools.feedback.web.messaging.MessageBus;
 
 public class JobService
@@ -29,12 +28,11 @@ public class JobService
     public JobService(final JobRepository jobRepository,
                       final MessageBus messageBus,
                       final ScheduledExecutorService scheduledExecutorService,
-                      final JenkinsFacade jenkinsFacade,
-                      final JobTestResultsDao jobTestResultsDao)
+                      final JenkinsFacade jenkinsFacade)
     {
         this.jobRepository = jobRepository;
         jobs = new CopyOnWriteArrayList<>();
-        final JobUpdater jobUpdaterRunnable = new JobUpdater(jenkinsFacade, jobTestResultsDao, jobs, messageBus, jobRepository);
+        final JobUpdater jobUpdaterRunnable = new JobUpdater(jenkinsFacade, jobs, messageBus, jobRepository);
         scheduledExecutorService.scheduleAtFixedRate(jobUpdaterRunnable, 0, 5, TimeUnit.SECONDS);
     }
 
