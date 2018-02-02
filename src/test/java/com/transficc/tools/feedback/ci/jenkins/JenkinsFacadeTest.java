@@ -50,7 +50,7 @@ public class JenkinsFacadeTest
     private final JenkinsServer jenkinsServer = Mockito.mock(JenkinsServer.class);
     private final JobWithDetails jobWithDetails = Mockito.mock(JobWithDetails.class);
     private final Build lastBuild = Mockito.mock(Build.class);
-    private final JenkinsFacade jenkinsFacade = new JenkinsFacade(jenkinsServer, "master job", new ClockService()
+    private final JenkinsFacade jenkinsFacade = new JenkinsFacade(jenkinsServer, new ClockService()
     {
         @Override
         public long currentTimeMillis()

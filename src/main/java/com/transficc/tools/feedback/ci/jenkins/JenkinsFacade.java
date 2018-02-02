@@ -40,17 +40,14 @@ public class JenkinsFacade implements ContinuousIntegrationServer
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(JenkinsFacade.class);
     private final JenkinsServer jenkins;
-    private final String masterJobName;
     private final ClockService clockService;
     private final VersionControl versionControl;
 
     public JenkinsFacade(final JenkinsServer jenkins,
-                         final String masterJobName,
                          final ClockService clockService,
                          final VersionControl versionControl)
     {
         this.jenkins = jenkins;
-        this.masterJobName = masterJobName;
         this.clockService = clockService;
         this.versionControl = versionControl;
     }
@@ -63,8 +60,7 @@ public class JenkinsFacade implements ContinuousIntegrationServer
             final Map<String, com.offbytwo.jenkins.model.Job> jobs = jenkins.getJobs();
             return Result.success(jobs.values()
                                           .stream()
-                                          .map(job -> new Job(job.getName(), job.getUrl(), JobStatus.DISABLED,
-                                                              masterJobName.equals(job.getName()), versionControl))
+                                          .map(job -> new Job(job.getName(), job.getUrl(), JobStatus.DISABLED, versionControl))
                                           .collect(Collectors.toList()));
         }
         catch (final IOException e)

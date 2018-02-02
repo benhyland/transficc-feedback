@@ -33,7 +33,7 @@ public class JobUpdaterTest
     private final ContinuousIntegrationServer continuousIntegrationServer = Mockito.mock(ContinuousIntegrationServer.class);
     private final MessageBus messageBus = Mockito.mock(MessageBus.class);
     private final JobRepository jobRepository = new JobRepository(Collections.emptyMap());
-    private final FeedbackJob feedbackJob = new FeedbackJob(1, new Job(JOB_NAME, JOB_URL, CURRENT_JOB_STATUS, false, VersionControl.GIT));
+    private final FeedbackJob feedbackJob = new FeedbackJob(false, 1, new Job(JOB_NAME, JOB_URL, CURRENT_JOB_STATUS, VersionControl.GIT));
     private final JobUpdater jobUpdater = new JobUpdater(continuousIntegrationServer, messageBus, jobRepository);
 
     @Test

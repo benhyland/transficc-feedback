@@ -22,9 +22,7 @@ public class Job
     private static final int GIT_HASH_LENGTH = 7;
     private final String name;
     private final String url;
-    private final boolean shouldDisplayCommentsForJob;
     private final VersionControl versionControl;
-
     private String revision = "";
     private JobStatus jobStatus;
     private JobStatus jobStatusToDisplay;
@@ -36,12 +34,11 @@ public class Job
     private long timestamp;
     private boolean hasJustCompleted;
 
-    public Job(final String name, final String url, final JobStatus jobStatus, final boolean shouldDisplayCommentsForJob, final VersionControl versionControl)
+    public Job(final String name, final String url, final JobStatus jobStatus, final VersionControl versionControl)
     {
         this.name = name;
         this.url = url;
         this.jobStatus = jobStatus;
-        this.shouldDisplayCommentsForJob = shouldDisplayCommentsForJob;
         this.versionControl = versionControl;
     }
 
@@ -66,7 +63,7 @@ public class Job
             this.buildNumber = buildNumber;
             this.timestamp = timestamp;
             this.jobCompletionPercentage = jobCompletionPercentage;
-            this.comments = shouldDisplayCommentsForJob ? comments : NO_COMMENTS;
+            this.comments = comments;
             this.hasJustCompleted = this.building && !building;
             this.building = building;
         }
@@ -83,9 +80,10 @@ public class Job
         return jobStatus;
     }
 
-    public PublishableJob createPublishable(final int priority)
+    public PublishableJob createPublishable(final int priority, final boolean shouldDisplayCommentsForJob)
     {
         final String revision = calculateRevision();
+        final String[] comments = shouldDisplayCommentsForJob ? this.comments : NO_COMMENTS;
         return new PublishableJob(name, url, priority, revision, jobStatus, jobStatusToDisplay, buildNumber, timestamp, jobCompletionPercentage, comments, building, jobsTestResults);
     }
 

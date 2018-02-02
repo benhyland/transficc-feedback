@@ -27,7 +27,7 @@ import static org.junit.Assert.assertThat;
 
 public class JobTest
 {
-    private final Job job = new Job("tom", "url", JobStatus.SUCCESS, false, VersionControl.GIT);
+    private final Job job = new Job("tom", "url", JobStatus.SUCCESS, VersionControl.GIT);
 
     @Before
     public void setup()
@@ -66,7 +66,7 @@ public class JobTest
     {
         Assert.assertTrue(job.wasUpdated(new LatestBuildInformation("revision21", JobStatus.SUCCESS, 2, 1468934838586L, 0, new String[0], false, null, 0)));
 
-        final PublishableJob publishable = job.createPublishable(1);
+        final PublishableJob publishable = job.createPublishable(1, false);
 
         assertThat(publishable.getRevision(), is("revisio"));
     }
@@ -74,10 +74,10 @@ public class JobTest
     @Test
     public void shouldNotTruncateRevisionIfVersionControlIsSvn()
     {
-        final Job job = new Job("tom", "url", JobStatus.SUCCESS, false, VersionControl.SVN);
+        final Job job = new Job("tom", "url", JobStatus.SUCCESS, VersionControl.SVN);
         Assert.assertTrue(job.wasUpdated(new LatestBuildInformation("revision21", JobStatus.SUCCESS, 2, 1468934838586L, 0, new String[0], false, null, 0)));
 
-        final PublishableJob publishable = job.createPublishable(1);
+        final PublishableJob publishable = job.createPublishable(1, false);
 
         assertThat(publishable.getRevision(), is("revision21"));
     }

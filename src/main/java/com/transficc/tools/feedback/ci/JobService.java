@@ -29,14 +29,17 @@ public class JobService implements Runnable
     private static final Logger LOGGER = LoggerFactory.getLogger(JobService.class);
     private final JobRepository jobRepository;
     private final ContinuousIntegrationServer continuousIntegrationServer;
+    private final String masterJobName;
 
     public JobService(final JobRepository jobRepository,
                       final MessageBus messageBus,
                       final ScheduledExecutorService scheduledExecutorService,
-                      final ContinuousIntegrationServer continuousIntegrationServer)
+                      final ContinuousIntegrationServer continuousIntegrationServer,
+                      final String masterJobName)
     {
         this.jobRepository = jobRepository;
         this.continuousIntegrationServer = continuousIntegrationServer;
+        this.masterJobName = masterJobName;
         final JobUpdater jobUpdaterRunnable = new JobUpdater(continuousIntegrationServer, messageBus, jobRepository);
         scheduledExecutorService.scheduleAtFixedRate(jobUpdaterRunnable, 0, 5, TimeUnit.SECONDS);
     }
@@ -48,7 +51,7 @@ public class JobService implements Runnable
         result.consume(statusCode -> LOGGER.error("Received status code {} when trying to obtain jobs", statusCode),
                        jobs -> jobs.stream()
                                .filter(job -> !jobExists(job.getName()))
-                               .forEach(job -> add(new FeedbackJob(jobRepository.getPriorityForJob(job.getName()), job))));
+                               .forEach(job -> add(new FeedbackJob(masterJobName.equals(job.getName()), jobRepository.getPriorityForJob(job.getName()), job))));
     }
 
     private void add(final FeedbackJob job)

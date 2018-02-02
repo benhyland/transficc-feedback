@@ -85,9 +85,8 @@ public class FeedbackMain
         final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(threadFactory);
         statusCheckerService.submit(new JobUpdateSubscriber(messageQueue, webSocketPublisher));
         final MessageBus messageBus = new MessageBus(messageQueue);
-        final ContinuousIntegrationServer ciServer = new JenkinsFacade(jenkins, feedbackProperties.getMasterJobName(),
-                                                                       clockService, feedbackProperties.getVersionControl());
-        final JobService jobService = new JobService(jobRepository, messageBus, scheduledExecutorService, ciServer);
+        final ContinuousIntegrationServer ciServer = new JenkinsFacade(jenkins, clockService, feedbackProperties.getVersionControl());
+        final JobService jobService = new JobService(jobRepository, messageBus, scheduledExecutorService, ciServer, feedbackProperties.getMasterJobName());
         final IterationRepository iterationRepository = new IterationRepository(messageBus, new IterationDao(dataSource));
         Routes.setup(server, jobRepository, iterationRepository, new BreakingNewsService(messageBus), webSocketPublisher, Router.router(vertx), startUpTime);
 

@@ -37,7 +37,7 @@ public class JobServiceTest
     private final MessageBus messageBus = new MessageBus(messageBusQueue);
     private final ContinuousIntegrationServer continuousIntegrationServer = Mockito.mock(ContinuousIntegrationServer.class);
     private final JobRepository jobRepository = new JobRepository(Collections.emptyMap());
-    private final JobService jobService = new JobService(jobRepository, messageBus, scheduledExecutorService, continuousIntegrationServer);
+    private final JobService jobService = new JobService(jobRepository, messageBus, scheduledExecutorService, continuousIntegrationServer, "job");
 
     @SuppressWarnings("unchecked")
     @Before
@@ -51,8 +51,8 @@ public class JobServiceTest
     public void shouldOnlyAddEachJobOnce()
     {
         BDDMockito.given(continuousIntegrationServer.getAllJobs())
-                .willReturn(Result.success(Collections.singletonList(new Job("Tom", "stuff.com", JobStatus.DISABLED, true, VersionControl.GIT))),
-                            Result.success(Collections.singletonList(new Job("Tom", "stuff.com", JobStatus.DISABLED, true, VersionControl.GIT))));
+                .willReturn(Result.success(Collections.singletonList(new Job("Tom", "stuff.com", JobStatus.DISABLED, VersionControl.GIT))),
+                            Result.success(Collections.singletonList(new Job("Tom", "stuff.com", JobStatus.DISABLED, VersionControl.GIT))));
 
         jobService.run();
         jobService.run();
@@ -71,9 +71,9 @@ public class JobServiceTest
     public void shouldAddJobAsTheyAreCreated()
     {
         BDDMockito.given(continuousIntegrationServer.getAllJobs())
-                .willReturn(Result.success(Collections.singletonList(new Job("Tom", "stuff.com", JobStatus.DISABLED, true, VersionControl.GIT))),
-                            Result.success(Arrays.asList(new Job("Tom", "stuff.com", JobStatus.DISABLED, true, VersionControl.GIT),
-                                                         new Job("Chinar", "stuff.com", JobStatus.DISABLED, true, VersionControl.GIT))));
+                .willReturn(Result.success(Collections.singletonList(new Job("Tom", "stuff.com", JobStatus.DISABLED, VersionControl.GIT))),
+                            Result.success(Arrays.asList(new Job("Tom", "stuff.com", JobStatus.DISABLED, VersionControl.GIT),
+                                                         new Job("Chinar", "stuff.com", JobStatus.DISABLED, VersionControl.GIT))));
 
         jobService.run();
         jobService.run();

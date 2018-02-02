@@ -7,11 +7,13 @@ import com.transficc.tools.feedback.web.messaging.PublishableJob;
 
 public class FeedbackJob
 {
+    private final boolean shouldDisplayCommentsForJob;
     private final int priority;
     private final Job job;
 
-    public FeedbackJob(final int priority, final Job job)
+    public FeedbackJob(final boolean shouldDisplayCommentsForJob, final int priority, final Job job)
     {
+        this.shouldDisplayCommentsForJob = shouldDisplayCommentsForJob;
         this.priority = priority;
         this.job = job;
     }
@@ -28,7 +30,7 @@ public class FeedbackJob
 
     public PublishableJob createPublishable()
     {
-        return job.createPublishable(priority);
+        return job.createPublishable(priority, shouldDisplayCommentsForJob);
     }
 
     public boolean wasUpdated(final LatestBuildInformation latestBuildInformation)
