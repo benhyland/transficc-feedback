@@ -12,6 +12,7 @@
  */
 package com.transficc.tools.feedback;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -51,9 +52,9 @@ public class JobRepository implements JobStatusSnapshot
         return jobNameToJob.containsKey(jobName);
     }
 
-    public void put(final String jobName, final FeedbackJob job)
+    public void add(final FeedbackJob job)
     {
-        jobNameToJob.put(jobName, job);
+        jobNameToJob.put(job.getName(), job);
     }
 
     public void remove(final String jobName)
@@ -64,5 +65,10 @@ public class JobRepository implements JobStatusSnapshot
     public int getPriorityForJob(final String jobName)
     {
         return jobsWithPriorities.getOrDefault(jobName, 0);
+    }
+
+    public Collection<FeedbackJob> getAllJobs()
+    {
+        return jobNameToJob.values();
     }
 }

@@ -72,8 +72,8 @@ public class WebSocketFrameHandlerTest
         //given
         final FeedbackJob job1 = new FeedbackJob(1, new Job("blah", "http://www.google.com", JobStatus.DISABLED, false, VersionControl.GIT));
         final FeedbackJob job2 = new FeedbackJob(2, new Job("Judd", "http://www.google.com", JobStatus.SUCCESS, true, VersionControl.GIT));
-        jobRepository.put("blah", job1);
-        jobRepository.put("Judd", job2);
+        jobRepository.add(job1);
+        jobRepository.add(job2);
         final WebSocketFrameImpl frame = new WebSocketFrameImpl("snapshot");
 
         //when

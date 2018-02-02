@@ -12,9 +12,6 @@
  */
 package com.transficc.tools.feedback.ci;
 
-import java.util.Iterator;
-import java.util.concurrent.CopyOnWriteArrayList;
-
 import com.transficc.functionality.Result;
 import com.transficc.tools.feedback.JobRepository;
 import com.transficc.tools.feedback.ci.jenkins.JenkinsFacade;
@@ -28,17 +25,14 @@ final class JobUpdater implements Runnable
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobUpdater.class);
     private final JenkinsFacade jenkinsFacade;
-    private final CopyOnWriteArrayList<FeedbackJob> jobs;
     private final MessageBus messageBus;
     private final JobRepository jobRepository;
 
     JobUpdater(final JenkinsFacade jenkinsFacade,
-               final CopyOnWriteArrayList<FeedbackJob> jobs,
                final MessageBus messageBus,
                final JobRepository jobRepository)
     {
         this.jenkinsFacade = jenkinsFacade;
-        this.jobs = jobs;
         this.messageBus = messageBus;
         this.jobRepository = jobRepository;
     }
@@ -46,14 +40,12 @@ final class JobUpdater implements Runnable
     @Override
     public void run()
     {
-        final Iterator<FeedbackJob> iterator = jobs.iterator();
-        while (iterator.hasNext())
+        for (final FeedbackJob job : jobRepository.getAllJobs())
         {
-            final FeedbackJob job = iterator.next();
             try
             {
                 final Result<Integer, LatestBuildInformation> latestBuildInformation = jenkinsFacade.getLatestBuildInformation(job.getName(), job.getJobStatus());
-                latestBuildInformation.consume(statusCode -> handleErrorStatus(iterator, job, statusCode),
+                latestBuildInformation.consume(statusCode -> handleErrorStatus(job, statusCode),
                                                buildInformation ->
                                                {
                                                    if (job.wasUpdated(buildInformation))
@@ -69,13 +61,12 @@ final class JobUpdater implements Runnable
         }
     }
 
-    private void handleErrorStatus(final Iterator<FeedbackJob> iterator, final FeedbackJob job, final Integer statusCode)
+    private void handleErrorStatus(final FeedbackJob job, final Integer statusCode)
     {
         if (statusCode == 404)
         {
             jobRepository.remove(job.getName());
             messageBus.jobRemoved(job.getName());
-            iterator.remove();
         }
         else
         {

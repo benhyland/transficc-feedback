@@ -13,7 +13,6 @@
 package com.transficc.tools.feedback.ci;
 
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -31,7 +30,6 @@ public class JobService implements Runnable
     private static final Logger LOGGER = LoggerFactory.getLogger(JobService.class);
     private final JobRepository jobRepository;
     private final JenkinsFacade jenkinsFacade;
-    private final CopyOnWriteArrayList<FeedbackJob> jobs;
 
     public JobService(final JobRepository jobRepository,
                       final MessageBus messageBus,
@@ -40,8 +38,7 @@ public class JobService implements Runnable
     {
         this.jobRepository = jobRepository;
         this.jenkinsFacade = jenkinsFacade;
-        jobs = new CopyOnWriteArrayList<>();
-        final JobUpdater jobUpdaterRunnable = new JobUpdater(jenkinsFacade, jobs, messageBus, jobRepository);
+        final JobUpdater jobUpdaterRunnable = new JobUpdater(jenkinsFacade, messageBus, jobRepository);
         scheduledExecutorService.scheduleAtFixedRate(jobUpdaterRunnable, 0, 5, TimeUnit.SECONDS);
     }
 
@@ -55,9 +52,8 @@ public class JobService implements Runnable
 
     private void add(final FeedbackJob job)
     {
-        jobs.add(job);
         final String jobName = job.getName();
-        jobRepository.put(jobName, job);
+        jobRepository.add(job);
     }
 
     private boolean jobExists(final String jobName)

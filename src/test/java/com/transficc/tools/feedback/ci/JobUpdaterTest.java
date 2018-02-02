@@ -1,6 +1,6 @@
 package com.transficc.tools.feedback.ci;
 
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Collections;
 
 import com.transficc.functionality.Result;
 import com.transficc.tools.feedback.JobRepository;
@@ -17,8 +17,10 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -30,17 +32,16 @@ public class JobUpdaterTest
     private static final String JOB_NAME = "Tom is the best";
     private static final JobStatus CURRENT_JOB_STATUS = JobStatus.SUCCESS;
     private final JenkinsFacade jenkinsFacade = Mockito.mock(JenkinsFacade.class);
-    private final CopyOnWriteArrayList<FeedbackJob> jobs = new CopyOnWriteArrayList<>();
     private final MessageBus messageBus = Mockito.mock(MessageBus.class);
-    private final JobRepository jobRepository = Mockito.mock(JobRepository.class);
+    private final JobRepository jobRepository = new JobRepository(Collections.emptyMap());
     private final FeedbackJob feedbackJob = new FeedbackJob(1, new Job(JOB_NAME, JOB_URL, CURRENT_JOB_STATUS, false, VersionControl.GIT));
-    private final JobUpdater jobUpdater = new JobUpdater(jenkinsFacade, jobs, messageBus, jobRepository);
+    private final JobUpdater jobUpdater = new JobUpdater(jenkinsFacade, messageBus, jobRepository);
 
     @Test
     public void shouldPushJobUpdateToMessageBus()
     {
         //Given
-        jobs.add(feedbackJob);
+        jobRepository.add(feedbackJob);
         final JobStatus expectedStatus = JobStatus.SUCCESS;
         final String expectedRevision = "5435dsd";
         final int expectedBuildNumber = 0;
@@ -64,7 +65,7 @@ public class JobUpdaterTest
     public void shouldNotPublishAnUpdateIfNothingHasChanged()
     {
         //Given
-        jobs.add(feedbackJob);
+        jobRepository.add(feedbackJob);
         final LatestBuildInformation buildUpdate = new LatestBuildInformation("", JobStatus.SUCCESS, 0, 10L, 0, new String[0], false, null, 0);
         given(jenkinsFacade.getLatestBuildInformation(JOB_NAME, CURRENT_JOB_STATUS)).willReturn(Result.success(buildUpdate));
 
@@ -80,7 +81,7 @@ public class JobUpdaterTest
     public void shouldRemoveJobIfNotFoundOnCIServer()
     {
         //Given
-        jobs.add(feedbackJob);
+        jobRepository.add(feedbackJob);
         given(jenkinsFacade.getLatestBuildInformation(JOB_NAME, CURRENT_JOB_STATUS)).willReturn(Result.error(404));
 
         //When
@@ -88,21 +89,22 @@ public class JobUpdaterTest
 
         //Then
         verify(messageBus).jobRemoved(JOB_NAME);
-        verify(jobRepository).remove(JOB_NAME);
+        assertFalse(jobRepository.contains(JOB_NAME));
     }
 
     @Test
     public void shouldDoNothingIfJobDoesNotHaveABuild()
     {
         //Given
-        jobs.add(feedbackJob);
+        jobRepository.add(feedbackJob);
         given(jenkinsFacade.getLatestBuildInformation(JOB_NAME, CURRENT_JOB_STATUS)).willReturn(Result.error(400));
 
         //When
         jobUpdater.run();
 
         //Then
-        verifyZeroInteractions(jobRepository, messageBus);
+        assertTrue(jobRepository.contains(JOB_NAME));
+        verifyZeroInteractions(messageBus);
     }
 
     private void assertJob(final FeedbackJob job,
