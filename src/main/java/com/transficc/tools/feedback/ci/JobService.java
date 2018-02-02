@@ -18,7 +18,6 @@ import java.util.concurrent.TimeUnit;
 
 import com.transficc.functionality.Result;
 import com.transficc.tools.feedback.JobRepository;
-import com.transficc.tools.feedback.ci.jenkins.JenkinsFacade;
 import com.transficc.tools.feedback.domain.Job;
 import com.transficc.tools.feedback.web.messaging.MessageBus;
 
@@ -29,30 +28,31 @@ public class JobService implements Runnable
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobService.class);
     private final JobRepository jobRepository;
-    private final JenkinsFacade jenkinsFacade;
+    private final ContinuousIntegrationServer continuousIntegrationServer;
 
     public JobService(final JobRepository jobRepository,
                       final MessageBus messageBus,
                       final ScheduledExecutorService scheduledExecutorService,
-                      final JenkinsFacade jenkinsFacade)
+                      final ContinuousIntegrationServer continuousIntegrationServer)
     {
         this.jobRepository = jobRepository;
-        this.jenkinsFacade = jenkinsFacade;
-        final JobUpdater jobUpdaterRunnable = new JobUpdater(jenkinsFacade, messageBus, jobRepository);
+        this.continuousIntegrationServer = continuousIntegrationServer;
+        final JobUpdater jobUpdaterRunnable = new JobUpdater(continuousIntegrationServer, messageBus, jobRepository);
         scheduledExecutorService.scheduleAtFixedRate(jobUpdaterRunnable, 0, 5, TimeUnit.SECONDS);
     }
 
     @Override
     public void run()
     {
-        final Result<Integer, List<Job>> result = jenkinsFacade.getAllJobs(name -> !jobExists(name));
+        final Result<Integer, List<Job>> result = continuousIntegrationServer.getAllJobs();
         result.consume(statusCode -> LOGGER.error("Received status code {} when trying to obtain jobs", statusCode),
-                       jobs -> jobs.forEach(job -> add(new FeedbackJob(jobRepository.getPriorityForJob(job.getName()), job))));
+                       jobs -> jobs.stream()
+                               .filter(job -> !jobExists(job.getName()))
+                               .forEach(job -> add(new FeedbackJob(jobRepository.getPriorityForJob(job.getName()), job))));
     }
 
     private void add(final FeedbackJob job)
     {
-        final String jobName = job.getName();
         jobRepository.add(job);
     }
 

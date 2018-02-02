@@ -4,7 +4,6 @@ import java.util.Collections;
 
 import com.transficc.functionality.Result;
 import com.transficc.tools.feedback.JobRepository;
-import com.transficc.tools.feedback.ci.jenkins.JenkinsFacade;
 import com.transficc.tools.feedback.domain.Job;
 import com.transficc.tools.feedback.domain.JobStatus;
 import com.transficc.tools.feedback.domain.LatestBuildInformation;
@@ -31,11 +30,11 @@ public class JobUpdaterTest
     private static final String JOB_URL = "tom-url";
     private static final String JOB_NAME = "Tom is the best";
     private static final JobStatus CURRENT_JOB_STATUS = JobStatus.SUCCESS;
-    private final JenkinsFacade jenkinsFacade = Mockito.mock(JenkinsFacade.class);
+    private final ContinuousIntegrationServer continuousIntegrationServer = Mockito.mock(ContinuousIntegrationServer.class);
     private final MessageBus messageBus = Mockito.mock(MessageBus.class);
     private final JobRepository jobRepository = new JobRepository(Collections.emptyMap());
     private final FeedbackJob feedbackJob = new FeedbackJob(1, new Job(JOB_NAME, JOB_URL, CURRENT_JOB_STATUS, false, VersionControl.GIT));
-    private final JobUpdater jobUpdater = new JobUpdater(jenkinsFacade, messageBus, jobRepository);
+    private final JobUpdater jobUpdater = new JobUpdater(continuousIntegrationServer, messageBus, jobRepository);
 
     @Test
     public void shouldPushJobUpdateToMessageBus()
@@ -51,7 +50,7 @@ public class JobUpdaterTest
         final TestResults expectedTestResults = new TestResults(1, 1, 2);
         final LatestBuildInformation buildUpdate = new LatestBuildInformation(expectedRevision, expectedStatus, expectedBuildNumber, expectedTimestamp, expectedCompletionPercentage, comments,
                                                                               false, expectedTestResults, 0);
-        given(jenkinsFacade.getLatestBuildInformation(JOB_NAME, CURRENT_JOB_STATUS)).willReturn(Result.success(buildUpdate));
+        given(continuousIntegrationServer.getLatestBuildInformation(JOB_NAME, CURRENT_JOB_STATUS)).willReturn(Result.success(buildUpdate));
 
         //When
         jobUpdater.run();
@@ -67,7 +66,7 @@ public class JobUpdaterTest
         //Given
         jobRepository.add(feedbackJob);
         final LatestBuildInformation buildUpdate = new LatestBuildInformation("", JobStatus.SUCCESS, 0, 10L, 0, new String[0], false, null, 0);
-        given(jenkinsFacade.getLatestBuildInformation(JOB_NAME, CURRENT_JOB_STATUS)).willReturn(Result.success(buildUpdate));
+        given(continuousIntegrationServer.getLatestBuildInformation(JOB_NAME, CURRENT_JOB_STATUS)).willReturn(Result.success(buildUpdate));
 
         //When
         jobUpdater.run();
@@ -82,7 +81,7 @@ public class JobUpdaterTest
     {
         //Given
         jobRepository.add(feedbackJob);
-        given(jenkinsFacade.getLatestBuildInformation(JOB_NAME, CURRENT_JOB_STATUS)).willReturn(Result.error(404));
+        given(continuousIntegrationServer.getLatestBuildInformation(JOB_NAME, CURRENT_JOB_STATUS)).willReturn(Result.error(404));
 
         //When
         jobUpdater.run();
@@ -97,7 +96,7 @@ public class JobUpdaterTest
     {
         //Given
         jobRepository.add(feedbackJob);
-        given(jenkinsFacade.getLatestBuildInformation(JOB_NAME, CURRENT_JOB_STATUS)).willReturn(Result.error(400));
+        given(continuousIntegrationServer.getLatestBuildInformation(JOB_NAME, CURRENT_JOB_STATUS)).willReturn(Result.error(400));
 
         //When
         jobUpdater.run();

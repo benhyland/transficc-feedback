@@ -15,7 +15,6 @@ package com.transficc.tools.feedback.ci.jenkins;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import com.offbytwo.jenkins.JenkinsServer;
@@ -26,6 +25,7 @@ import com.offbytwo.jenkins.model.BuildResult;
 import com.offbytwo.jenkins.model.BuildWithDetails;
 import com.offbytwo.jenkins.model.JobWithDetails;
 import com.transficc.functionality.Result;
+import com.transficc.tools.feedback.ci.ContinuousIntegrationServer;
 import com.transficc.tools.feedback.domain.Job;
 import com.transficc.tools.feedback.domain.JobStatus;
 import com.transficc.tools.feedback.domain.LatestBuildInformation;
@@ -36,7 +36,7 @@ import com.transficc.tools.feedback.util.ClockService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JenkinsFacade
+public class JenkinsFacade implements ContinuousIntegrationServer
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(JenkinsFacade.class);
     private final JenkinsServer jenkins;
@@ -55,14 +55,14 @@ public class JenkinsFacade
         this.versionControl = versionControl;
     }
 
-    public Result<Integer, List<Job>> getAllJobs(final Predicate<String> filter)
+    @Override
+    public Result<Integer, List<Job>> getAllJobs()
     {
         try
         {
             final Map<String, com.offbytwo.jenkins.model.Job> jobs = jenkins.getJobs();
             return Result.success(jobs.values()
                                           .stream()
-                                          .filter(job -> filter.test(job.getName()))
                                           .map(job -> new Job(job.getName(), job.getUrl(), JobStatus.DISABLED,
                                                               masterJobName.equals(job.getName()), versionControl))
                                           .collect(Collectors.toList()));
@@ -74,6 +74,7 @@ public class JenkinsFacade
         }
     }
 
+    @Override
     public Result<Integer, LatestBuildInformation> getLatestBuildInformation(final String jobName, final JobStatus previousJobStatus)
     {
         try

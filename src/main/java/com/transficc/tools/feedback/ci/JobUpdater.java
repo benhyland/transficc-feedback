@@ -14,7 +14,6 @@ package com.transficc.tools.feedback.ci;
 
 import com.transficc.functionality.Result;
 import com.transficc.tools.feedback.JobRepository;
-import com.transficc.tools.feedback.ci.jenkins.JenkinsFacade;
 import com.transficc.tools.feedback.domain.LatestBuildInformation;
 import com.transficc.tools.feedback.web.messaging.MessageBus;
 
@@ -24,15 +23,15 @@ import org.slf4j.LoggerFactory;
 final class JobUpdater implements Runnable
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobUpdater.class);
-    private final JenkinsFacade jenkinsFacade;
+    private final ContinuousIntegrationServer continuousIntegrationServer;
     private final MessageBus messageBus;
     private final JobRepository jobRepository;
 
-    JobUpdater(final JenkinsFacade jenkinsFacade,
+    JobUpdater(final ContinuousIntegrationServer continuousIntegrationServer,
                final MessageBus messageBus,
                final JobRepository jobRepository)
     {
-        this.jenkinsFacade = jenkinsFacade;
+        this.continuousIntegrationServer = continuousIntegrationServer;
         this.messageBus = messageBus;
         this.jobRepository = jobRepository;
     }
@@ -44,7 +43,7 @@ final class JobUpdater implements Runnable
         {
             try
             {
-                final Result<Integer, LatestBuildInformation> latestBuildInformation = jenkinsFacade.getLatestBuildInformation(job.getName(), job.getJobStatus());
+                final Result<Integer, LatestBuildInformation> latestBuildInformation = continuousIntegrationServer.getLatestBuildInformation(job.getName(), job.getJobStatus());
                 latestBuildInformation.consume(statusCode -> handleErrorStatus(job, statusCode),
                                                buildInformation ->
                                                {

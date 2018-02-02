@@ -27,6 +27,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.offbytwo.jenkins.JenkinsServer;
+import com.transficc.tools.feedback.ci.ContinuousIntegrationServer;
 import com.transficc.tools.feedback.ci.JobService;
 import com.transficc.tools.feedback.ci.jenkins.JenkinsFacade;
 import com.transficc.tools.feedback.dao.IterationDao;
@@ -84,9 +85,9 @@ public class FeedbackMain
         final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(threadFactory);
         statusCheckerService.submit(new JobUpdateSubscriber(messageQueue, webSocketPublisher));
         final MessageBus messageBus = new MessageBus(messageQueue);
-        final JenkinsFacade jenkinsFacade = new JenkinsFacade(jenkins, feedbackProperties.getMasterJobName(),
-                                                              clockService, feedbackProperties.getVersionControl());
-        final JobService jobService = new JobService(jobRepository, messageBus, scheduledExecutorService, jenkinsFacade);
+        final ContinuousIntegrationServer ciServer = new JenkinsFacade(jenkins, feedbackProperties.getMasterJobName(),
+                                                                       clockService, feedbackProperties.getVersionControl());
+        final JobService jobService = new JobService(jobRepository, messageBus, scheduledExecutorService, ciServer);
         final IterationRepository iterationRepository = new IterationRepository(messageBus, new IterationDao(dataSource));
         Routes.setup(server, jobRepository, iterationRepository, new BreakingNewsService(messageBus), webSocketPublisher, Router.router(vertx), startUpTime);
 
