@@ -24,6 +24,12 @@ import com.transficc.tools.feedback.web.routes.JobStatusSnapshot;
 public class JobRepository implements JobStatusSnapshot
 {
     private final Map<String, FeedbackJob> jobNameToJob = new ConcurrentHashMap<>();
+    private final Map<String, Integer> jobsWithPriorities;
+
+    public JobRepository(final Map<String, Integer> jobsWithPriorities)
+    {
+        this.jobsWithPriorities = jobsWithPriorities;
+    }
 
     @Override
     public List<PublishableJob> getPublishableJobs()
@@ -53,5 +59,10 @@ public class JobRepository implements JobStatusSnapshot
     public void remove(final String jobName)
     {
         jobNameToJob.remove(jobName);
+    }
+
+    public int getPriorityForJob(final String jobName)
+    {
+        return jobsWithPriorities.getOrDefault(jobName, 0);
     }
 }

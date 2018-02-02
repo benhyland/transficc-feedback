@@ -12,6 +12,8 @@
  */
 package com.transficc.tools.feedback.web.routes.websocket;
 
+import java.util.Collections;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,11 +44,11 @@ public class WebSocketFrameHandlerTest
     private final EventBus eventBus = Mockito.mock(EventBus.class);
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final SafeSerialisation safeSerialisation = new SafeSerialisation(objectMapper);
-    private final JobRepository jobRepository = new JobRepository();
+    private final JobRepository jobRepository = new JobRepository(Collections.emptyMap());
     private final WebSocketFrameHandler handler = new WebSocketFrameHandler(SESSION_ID, eventBus, safeSerialisation, () -> CLOCK_TIME, jobRepository, START_UP_TIME);
 
     @Before
-    public void setUp() throws Exception
+    public void setUp()
     {
         objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
     }

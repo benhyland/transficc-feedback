@@ -12,17 +12,25 @@
  */
 package com.transficc.tools.feedback.ci;
 
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import com.transficc.functionality.Result;
 import com.transficc.tools.feedback.JobRepository;
 import com.transficc.tools.feedback.ci.jenkins.JenkinsFacade;
+import com.transficc.tools.feedback.domain.Job;
 import com.transficc.tools.feedback.web.messaging.MessageBus;
 
-public class JobService
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class JobService implements Runnable
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobService.class);
     private final JobRepository jobRepository;
+    private final JenkinsFacade jenkinsFacade;
     private final CopyOnWriteArrayList<FeedbackJob> jobs;
 
     public JobService(final JobRepository jobRepository,
@@ -31,21 +39,29 @@ public class JobService
                       final JenkinsFacade jenkinsFacade)
     {
         this.jobRepository = jobRepository;
+        this.jenkinsFacade = jenkinsFacade;
         jobs = new CopyOnWriteArrayList<>();
         final JobUpdater jobUpdaterRunnable = new JobUpdater(jenkinsFacade, jobs, messageBus, jobRepository);
         scheduledExecutorService.scheduleAtFixedRate(jobUpdaterRunnable, 0, 5, TimeUnit.SECONDS);
     }
 
-    public void add(final FeedbackJob job)
+    @Override
+    public void run()
+    {
+        final Result<Integer, List<Job>> result = jenkinsFacade.getAllJobs(name -> !jobExists(name));
+        result.consume(statusCode -> LOGGER.error("Received status code {} when trying to obtain jobs", statusCode),
+                       jobs -> jobs.forEach(job -> add(new FeedbackJob(jobRepository.getPriorityForJob(job.getName()), job))));
+    }
+
+    private void add(final FeedbackJob job)
     {
         jobs.add(job);
         final String jobName = job.getName();
         jobRepository.put(jobName, job);
     }
 
-    public boolean jobExists(final String jobName)
+    private boolean jobExists(final String jobName)
     {
         return jobRepository.contains(jobName);
     }
-
 }

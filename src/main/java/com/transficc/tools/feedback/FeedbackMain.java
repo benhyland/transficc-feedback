@@ -27,8 +27,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.offbytwo.jenkins.JenkinsServer;
-import com.transficc.tools.feedback.ci.JobFinder;
-import com.transficc.tools.feedback.ci.JobPrioritiesRepository;
 import com.transficc.tools.feedback.ci.JobService;
 import com.transficc.tools.feedback.ci.jenkins.JenkinsFacade;
 import com.transficc.tools.feedback.dao.IterationDao;
@@ -69,7 +67,7 @@ public class FeedbackMain
         mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
         final SafeSerialisation safeSerialisation = new SafeSerialisation(mapper);
         final ClockService clockService = System::currentTimeMillis;
-        final JobRepository jobRepository = new JobRepository();
+        final JobRepository jobRepository = new JobRepository(feedbackProperties.getJobsWithPriorities());
         final long startUpTime = clockService.currentTimeMillis();
         final WebSocketPublisher webSocketPublisher = new WebSocketPublisher(vertx.eventBus(), safeSerialisation, clockService, jobRepository, startUpTime);
         final JenkinsServer jenkins = createJenkinsServer(feedbackProperties);
@@ -88,14 +86,11 @@ public class FeedbackMain
         final MessageBus messageBus = new MessageBus(messageQueue);
         final JenkinsFacade jenkinsFacade = new JenkinsFacade(jenkins, feedbackProperties.getMasterJobName(),
                                                               clockService, feedbackProperties.getVersionControl());
-        final JobService jobService = new JobService(jobRepository, messageBus, scheduledExecutorService,
-                                                     jenkinsFacade
-        );
+        final JobService jobService = new JobService(jobRepository, messageBus, scheduledExecutorService, jenkinsFacade);
         final IterationRepository iterationRepository = new IterationRepository(messageBus, new IterationDao(dataSource));
         Routes.setup(server, jobRepository, iterationRepository, new BreakingNewsService(messageBus), webSocketPublisher, Router.router(vertx), startUpTime);
-        final JobFinder jobFinder = new JobFinder(jobService, jenkinsFacade, new JobPrioritiesRepository(feedbackProperties.getJobsWithPriorities()));
 
-        scheduledExecutorService.scheduleAtFixedRate(jobFinder, 0, 5, TimeUnit.MINUTES);
+        scheduledExecutorService.scheduleAtFixedRate(jobService, 0, 5, TimeUnit.MINUTES);
         server.listen(feedbackProperties.getFeedbackPort());
     }
 
