@@ -46,7 +46,7 @@ public class PublishableJob
                           final boolean building,
                           final TestResults jobsTestResults)
     {
-        this.name = name;
+        this.name = name.replace('/', ' ');
         this.url = url;
         this.priority = priority;
         this.revision = revision;

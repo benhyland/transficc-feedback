@@ -75,6 +75,16 @@ public class FeedbackProperties
         return properties.getProperty("feedback.jenkins.password");
     }
 
+    public String getGitlabUrl()
+    {
+        return properties.getProperty("feedback.gitlab.url");
+    }
+
+    public String getGitlabToken()
+    {
+        return properties.getProperty("feedback.gitlab.token");
+    }
+
     public int getFeedbackPort()
     {
         return getInteger("feedback.port");

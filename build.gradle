@@ -81,6 +81,7 @@ def defineLocalLibs()
             'commons-logging'     : 'commons-logging:commons-logging:1.2',
             'findbugs-annotations': 'com.google.code.findbugs:annotations:3.0.1',
             'flyway-core'         : 'org.flywaydb:flyway-core:4.0',
+            'gitlab4j'            : 'org.gitlab4j:gitlab4j-api:4.8.0',
             'handlebars'          : 'com.github.jknack:handlebars:4.0.3',
             'h2database'          : 'com.h2database:h2:1.4.192',
             'jenkins-client'      : 'com.offbytwo.jenkins:jenkins-client:0.3.7',
@@ -122,6 +123,7 @@ dependencies {
     compile libs.'commons-logging'
     compile libs.'findbugs-annotations'
     compile libs.'flyway-core'
+    compile libs.'gitlab4j'
     compile libs.'handlebars'
     compile libs.'h2database'
     compile libs.'jackson'

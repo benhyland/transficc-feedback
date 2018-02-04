@@ -29,6 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.offbytwo.jenkins.JenkinsServer;
 import com.transficc.tools.feedback.ci.ContinuousIntegrationServer;
 import com.transficc.tools.feedback.ci.JobService;
+import com.transficc.tools.feedback.ci.gitlab.GitlabFacade;
 import com.transficc.tools.feedback.ci.jenkins.JenkinsFacade;
 import com.transficc.tools.feedback.dao.IterationDao;
 import com.transficc.tools.feedback.util.ClockService;
@@ -42,6 +43,7 @@ import com.transficc.tools.feedback.web.routes.WebSocketPublisher;
 import com.transficc.tools.feedback.web.routes.websocket.OutboundWebSocketFrame;
 
 import org.flywaydb.core.Flyway;
+import org.gitlab4j.api.GitLabApi;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,7 +73,6 @@ public class FeedbackMain
         final JobRepository jobRepository = new JobRepository(feedbackProperties.getJobsWithPriorities());
         final long startUpTime = clockService.currentTimeMillis();
         final WebSocketPublisher webSocketPublisher = new WebSocketPublisher(vertx.eventBus(), safeSerialisation, clockService, jobRepository, startUpTime);
-        final JenkinsServer jenkins = createJenkinsServer(feedbackProperties);
         final BlockingQueue<OutboundWebSocketFrame> messageQueue = new LinkedBlockingQueue<>();
 
         final JdbcConnectionPool dataSource = JdbcConnectionPool.create("jdbc:h2:~/data/feedback", "feedback", "");
@@ -85,13 +86,30 @@ public class FeedbackMain
         final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(threadFactory);
         statusCheckerService.submit(new JobUpdateSubscriber(messageQueue, webSocketPublisher));
         final MessageBus messageBus = new MessageBus(messageQueue);
-        final ContinuousIntegrationServer ciServer = new JenkinsFacade(jenkins, clockService, feedbackProperties.getVersionControl());
+        final ContinuousIntegrationServer ciServer = makeCIServer(clockService, feedbackProperties);
         final JobService jobService = new JobService(jobRepository, messageBus, scheduledExecutorService, ciServer, feedbackProperties.getMasterJobName());
         final IterationRepository iterationRepository = new IterationRepository(messageBus, new IterationDao(dataSource));
         Routes.setup(server, jobRepository, iterationRepository, new BreakingNewsService(messageBus), webSocketPublisher, Router.router(vertx), startUpTime);
 
         scheduledExecutorService.scheduleAtFixedRate(jobService, 0, 5, TimeUnit.MINUTES);
         server.listen(feedbackProperties.getFeedbackPort());
+    }
+
+    private static ContinuousIntegrationServer makeCIServer(final ClockService clockService, final FeedbackProperties feedbackProperties)
+    {
+        final String jenkinsUrl = feedbackProperties.getJenkinsUrl();
+        if (jenkinsUrl != null)
+        {
+            return new JenkinsFacade(createJenkinsServer(feedbackProperties), clockService, feedbackProperties.getVersionControl());
+        }
+
+        final String gitlabUrl = feedbackProperties.getGitlabUrl();
+        if (gitlabUrl != null)
+        {
+            return new GitlabFacade(createGitlabApi(feedbackProperties));
+        }
+
+        throw new RuntimeException("must configure either Jenkins or Gitlab properties");
     }
 
     private static JenkinsServer createJenkinsServer(final FeedbackProperties feedbackProperties)
@@ -108,6 +126,11 @@ public class FeedbackMain
         }
         LOGGER.info("Connecting to Jenkins server at {}", jenkinsUrl);
         return jenkins;
+    }
+
+    private static GitLabApi createGitlabApi(final FeedbackProperties feedbackProperties)
+    {
+        return new GitLabApi(feedbackProperties.getGitlabUrl(), feedbackProperties.getGitlabToken());
     }
 
 }
